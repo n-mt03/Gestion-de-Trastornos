@@ -103,6 +103,66 @@ class PatientModule {
     }
   }
 
+  openEditPatientModal() {
+    const modal = document.getElementById('patient-edit-modal');
+    if (!modal) return;
+    
+    const state = window.appState.getState();
+    const p = state.patient;
+    
+    document.getElementById('patient-edit-name').value = p.name || '';
+    document.getElementById('patient-edit-phone').value = p.phone || '';
+    document.getElementById('patient-edit-email').value = p.email || '';
+    document.getElementById('patient-edit-gambling-avg').value = p.dailyGamblingAvg || 3500;
+    document.getElementById('patient-edit-hours-avg').value = p.dailyHoursAvg || 3.5;
+    document.getElementById('patient-edit-budget').value = p.weeklySupervisedBudget || 6000;
+    
+    if (p.abstinenceStartDate) {
+      const d = new Date(p.abstinenceStartDate);
+      const tzoffset = d.getTimezoneOffset() * 60000;
+      const localISOTime = (new Date(d - tzoffset)).toISOString().slice(0,16);
+      document.getElementById('patient-edit-date').value = localISOTime;
+    }
+    
+    modal.classList.add('active');
+  }
+
+  closeEditPatientModal() {
+    const modal = document.getElementById('patient-edit-modal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  savePatientEdit() {
+    const state = window.appState.getState();
+    const p = { ...state.patient };
+    
+    const name = document.getElementById('patient-edit-name').value.trim();
+    if (!name) {
+      window.appState.showToast('El nombre del paciente es obligatorio', 'error');
+      return;
+    }
+    
+    p.name = name;
+    p.phone = document.getElementById('patient-edit-phone').value.trim();
+    p.email = document.getElementById('patient-edit-email').value.trim();
+    p.dailyGamblingAvg = Number(document.getElementById('patient-edit-gambling-avg').value) || 0;
+    p.dailyHoursAvg = Number(document.getElementById('patient-edit-hours-avg').value) || 0;
+    p.weeklySupervisedBudget = Number(document.getElementById('patient-edit-budget').value) || 0;
+    
+    const dateVal = document.getElementById('patient-edit-date').value;
+    if (dateVal) {
+      p.abstinenceStartDate = new Date(dateVal).toISOString();
+    }
+    
+    window.appState.setState({ patient: p });
+    this.closeEditPatientModal();
+    this.renderHeroStats();
+    window.appState.showToast('Perfil de paciente actualizado exitosamente', 'success');
+    
+    this.updateClock();
+    this.renderMilestones();
+  }
+
   setupCheckinModal() {
     const slider = document.getElementById('checkin-craving-slider');
     const badge = document.getElementById('checkin-craving-badge');

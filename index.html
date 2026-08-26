@@ -144,10 +144,13 @@
         <!-- HERO RECOVERY CLOCK -->
         <div class="recovery-hero">
           <div class="hero-header">
-            <div class="patient-pill">
+            <div class="patient-pill" style="position:relative;">
               <div class="patient-avatar" id="hero-patient-avatar">R</div>
               <div class="patient-meta">
-                <h2 id="hero-patient-name">Roberto Gómez</h2>
+                <h2 id="hero-patient-name" style="display:flex; align-items:center; gap:8px;">
+                  Roberto Gómez 
+                  <button class="btn btn-outline btn-sm" style="padding:2px 6px; font-size:11px;" onclick="window.patientModule.openEditPatientModal()">✏️ Editar</button>
+                </h2>
                 <p id="hero-patient-status">En Fase 2 (Intervención TCC) • Contacto: Laura Gómez</p>
               </div>
             </div>
@@ -1019,6 +1022,59 @@
     <!-- ==========================================
          MODALS CONTAINER
          ========================================== -->
+
+    <!-- MODAL 0: EDITAR PERFIL DE PACIENTE Y REINICIAR CONTADOR -->
+    <div class="modal-overlay" id="patient-edit-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">⚙️ Editar Perfil de Paciente</div>
+          <button class="modal-close" onclick="window.patientModule.closeEditPatientModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nombre del Paciente: <span class="required">*</span></label>
+            <input type="text" class="form-control" id="patient-edit-name" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Teléfono:</label>
+              <input type="tel" class="form-control" id="patient-edit-phone" placeholder="Ej: +1 809..." />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Correo Electrónico:</label>
+              <input type="email" class="form-control" id="patient-edit-email" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Gasto Diario Promedio en Juego (RD$):</label>
+              <input type="number" class="form-control" id="patient-edit-gambling-avg" placeholder="Ej: 3500" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Horas Diarias de Juego:</label>
+              <input type="number" step="0.5" class="form-control" id="patient-edit-hours-avg" placeholder="Ej: 3.5" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Presupuesto Semanal Tasado / Dinero de Bolsillo (RD$):</label>
+            <input type="number" class="form-control" id="patient-edit-budget" placeholder="Ej: 6000" />
+          </div>
+
+          <div class="form-group" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 12px; border-radius: var(--radius-md);">
+            <label class="form-label" style="color: var(--danger-crimson-light);">Reinicio de Contador (Abstinencia):</label>
+            <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 8px;">Si hubo una recaída o estás iniciando el proceso, establece la fecha y hora exacta del último episodio de juego para reiniciar el contador.</p>
+            <input type="datetime-local" class="form-control" id="patient-edit-date" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="window.patientModule.closeEditPatientModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="window.patientModule.savePatientEdit()">💾 Guardar Cambios</button>
+        </div>
+      </div>
+    </div>
 
     <!-- MODAL 1: CHECK-IN DIARIO DE CRAVING -->
     <div class="modal-overlay" id="checkin-modal">
