@@ -38,7 +38,7 @@ class GoogleCalendarSync {
           const dueStart = new Date(debt.nextDueDate + 'T10:00:00');
           const dueEnd = new Date(debt.nextDueDate + 'T10:30:00');
           await this.createEvent({
-            summary: `💳 Pago de Acuerdo: ${debt.creditorName} ($${debt.amountOwed})`,
+            summary: `💳 Pago de Acuerdo: ${debt.creditorName} (RD$ ${debt.amountOwed})`,
             description: `Vencimiento de cuota según acuerdo pactado.\nInterlocutor: Responsable Financiero.\nTérminos: ${debt.agreementTerms || ''}`,
             start: { dateTime: dueStart.toISOString() },
             end: { dateTime: dueEnd.toISOString() }

@@ -85,7 +85,7 @@ Fecha de Emisión: ${new Date().toLocaleDateString('es-ES')}
 • Teléfono: ${p.phone} | Email: ${p.email}
 • Fecha de Inicio de Abstinencia: ${new Date(p.abstinenceStartDate).toLocaleString('es-ES')}
 • Días Continuos Libres de Juego: ${p.daysClean || 0} días
-• Estimación de Fondos Preservados: $${(p.moneySavedEstimated || 0).toLocaleString()}
+• Estimación de Fondos Preservados: RD$ ${(p.moneySavedEstimated || 0).toLocaleString()}
 • Horas de Vida Recuperadas: ${p.hoursSavedEstimated || 0} horas
 • Contacto de Emergencia: ${p.emergencyContact}
 • Acompañante de Guardia: ${p.guardCompanion} (${p.guardCompanionPhone})
@@ -105,7 +105,7 @@ ${family.map(f => `• [Rol ${f.roleCode}: ${f.roleTitle}]
 ============================================================
 ${debts.map(d => `• Acreedor: ${d.creditorName} (${d.debtType})
   - Contacto: ${d.phone} | Prioridad: ${d.priority} | Estado: ${d.status}
-  - Monto Original: $${Number(d.amountBorrowed).toLocaleString()} | Saldo Adeudado Actual: $${Number(d.amountOwed).toLocaleString()}
+  - Monto Original: RD$ ${Number(d.amountBorrowed).toLocaleString()} | Saldo Adeudado Actual: RD$ ${Number(d.amountOwed).toLocaleString()}
   - Frecuencia de Pago: ${d.paymentFrequency} | Próximo Vencimiento: ${d.nextDueDate}
   - ACUERDO PACTADO: "${d.agreementTerms || 'Sin acuerdo formal documentado'}"
 `).join('\n')}
@@ -114,7 +114,7 @@ ${debts.map(d => `• Acreedor: ${d.creditorName} (${d.debtType})
 4. REGLAS FAMILIARES Y PROTOCOLO ANTI-BAILOUT
 ============================================================
 1. NUNCA pagar deudas en secreto ni realizar rescates financieros encubiertos (evitar el efecto bailout).
-2. La entrega de efectivo se limita estrictamente al presupuesto semanal tasado ($${p.weeklySupervisedBudget || 120}/semana) administrado por el Responsable Financiero.
+2. La entrega de efectivo se limita estrictamente al presupuesto semanal tasado (RD$ ${p.weeklySupervisedBudget || 6000}/semana) administrado por el Responsable Financiero.
 3. Ante un deseo agudo de jugar (craving), se activa el Protocolo SOS en 1 clic y el ejercicio Urge Surfing.
 
 Documento confidencial para uso del equipo terapéutico, psiquiátrico y familiar.

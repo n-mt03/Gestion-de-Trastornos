@@ -95,7 +95,7 @@ class GoogleSheetsSync {
   async updatePatientSheet(spreadsheetId) {
     const patient = window.appState.getState().patient;
     const values = [
-      ['ID', 'Nombre del Paciente', 'Teléfono', 'Email', 'Inicio Abstinencia', 'Gasto Diario Promedio ($)', 'Horas Diarias Juego', 'Contacto Emergencia', 'Acompañante de Guardia', 'Presupuesto Semanal Tasado ($)', 'Estado Clínico'],
+      ['ID', 'Nombre del Paciente', 'Teléfono', 'Email', 'Inicio Abstinencia', 'Gasto Diario Promedio (RD$)', 'Horas Diarias Juego', 'Contacto Emergencia', 'Acompañante de Guardia', 'Presupuesto Semanal Tasado (RD$)', 'Estado Clínico'],
       [
         patient.id,
         patient.name,
@@ -133,7 +133,7 @@ class GoogleSheetsSync {
   async updateDebtsSheet(spreadsheetId) {
     const debts = window.appState.getState().debts;
     const values = [
-      ['ID', 'Acreedor / Entidad Financiera', 'Teléfono', 'Categoría de Deuda', 'Monto Tomado Prestado ($)', 'Saldo Adeudado a la Fecha ($)', 'Tasa de Interés / Cargos', 'Frecuencia de Pago', 'Próximo Vencimiento', 'Nivel de Prioridad', 'Estado de la Deuda', 'Términos del Acuerdo Pactado con el Prestamista'],
+      ['ID', 'Acreedor / Entidad Financiera', 'Teléfono', 'Categoría de Deuda', 'Monto Tomado Prestado (RD$)', 'Saldo Adeudado a la Fecha (RD$)', 'Tasa de Interés / Cargos', 'Frecuencia de Pago', 'Próximo Vencimiento', 'Nivel de Prioridad', 'Estado de la Deuda', 'Términos del Acuerdo Pactado con el Prestamista'],
       ...debts.map(d => [
         d.id,
         d.creditorName,
@@ -169,7 +169,7 @@ class GoogleSheetsSync {
     });
 
     const values = [
-      ['ID Pago', 'Fecha de Abono', 'ID Deuda', 'Acreedor', 'Monto Abonado ($)', 'Notas / Comprobante'],
+      ['ID Pago', 'Fecha de Abono', 'ID Deuda', 'Acreedor', 'Monto Abonado (RD$)', 'Notas / Comprobante'],
       ...amortRows
     ];
     await this.updateSheetRange(spreadsheetId, `04_Historial_Amortizaciones!A1:F${Math.max(2, values.length)}`, values);
