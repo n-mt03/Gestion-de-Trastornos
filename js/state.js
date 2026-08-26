@@ -1,6 +1,7 @@
 /**
  * RUTA DE RECUPERACIÓN - CENTRAL STATE MANAGEMENT
  * Reactive state store with LocalStorage persistence and event emitter
+ * Currency: Pesos Dominicanos (DOP / RD$)
  */
 
 class AppState {
@@ -14,7 +15,10 @@ class AppState {
     const saved = localStorage.getItem(this.storageKey);
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Ensure currency is set to DOP
+        parsed.currency = 'DOP';
+        return parsed;
       } catch (e) {
         console.error('Error loading saved state, generating default state:', e);
       }
@@ -30,6 +34,8 @@ class AppState {
     startDate.setHours(8, 0, 0, 0);
 
     return {
+      currency: 'DOP',
+      currencySymbol: 'RD$',
       currentView: 'patient', // 'patient' | 'family' | 'specialist'
       activeTab: 'dashboard',  // 'dashboard' | 'family' | 'debts' | 'exercises' | 'psychoeducation' | 'google'
       
@@ -39,13 +45,13 @@ class AppState {
         phone: '+1 (809) 555-2468',
         email: 'roberto.recuperacion@gmail.com',
         abstinenceStartDate: startDate.toISOString(),
-        dailyGamblingAvg: 65, // Average daily loss before stopping
-        dailyHoursAvg: 3.5,   // Average daily hours spent gambling
+        dailyGamblingAvg: 3500, // Average daily loss in RD$ before stopping
+        dailyHoursAvg: 3.5,     // Average daily hours spent gambling
         emergencyContact: 'Laura Gómez (Esposa) - +1 (809) 555-0199',
         guardCompanion: 'Carlos Gómez (Hermano)',
         guardCompanionPhone: '+1 (809) 555-0144',
         guardCompanionWhatsapp: '18095550144',
-        weeklySupervisedBudget: 120, // $120 weekly cash pocket money
+        weeklySupervisedBudget: 6000, // RD$ 6,000 weekly cash pocket money
         status: 'En Fase 2 (Intervención TCC)'
       },
 
@@ -81,9 +87,9 @@ class AppState {
           phone: '+1 (809) 555-0144',
           keyTask: 'Custodia de tarjetas, claves bancarias, entrega de presupuesto tasado y libro de deudas.',
           tasks: [
-            { id: 't-3', text: 'Entregar presupuesto semanal tasado en efectivo ($120)', done: true, dueDate: '2026-08-25' },
+            { id: 't-3', text: 'Entregar presupuesto semanal tasado en efectivo (RD$ 6,000)', done: true, dueDate: '2026-08-25' },
             { id: 't-4', text: 'Auditar extracto bancario y validar cero solicitudes de préstamos', done: true, dueDate: '2026-08-24' },
-            { id: 't-5', text: 'Efectuar pago pactado quincenal al Banco Nacional', done: false, dueDate: '2026-08-30' }
+            { id: 't-5', text: 'Efectuar pago pactado quincenal al Banco Popular', done: false, dueDate: '2026-08-30' }
           ]
         },
         {
@@ -129,19 +135,19 @@ class AppState {
       debts: [
         {
           id: 'd-1',
-          creditorName: 'Banco Nacional (Tarjeta Crédito Visa)',
-          phone: '+1 (809) 555-8000',
+          creditorName: 'Banco Popular Dominicano (Tarjeta Visa)',
+          phone: '+1 (809) 544-5000',
           debtType: 'Entidad Bancaria / Tarjeta',
-          amountBorrowed: 4500,
-          amountOwed: 2900,
+          amountBorrowed: 250000,
+          amountOwed: 160000,
           interestRate: '18% anual (Congelado por acuerdo)',
           paymentFrequency: 'Mensual',
           nextDueDate: '2026-09-05',
           priority: 'Alta',
           status: 'Al Día',
-          agreementTerms: 'Acuerdo pactado con el gestor de cobranza: Congelación total de intereses por 12 meses condicionado a pagos fijos de $250 mensuales. El familiar financiero Carlos Gómez figura como interlocutor verificado.',
+          agreementTerms: 'Acuerdo pactado con el gestor de cobranza: Congelación total de intereses por 12 meses condicionado a pagos fijos de RD$ 15,000 mensuales. El familiar financiero Carlos Gómez figura como interlocutor verificado.',
           amortizations: [
-            { id: 'am-1', date: '2026-08-05', amount: 250, note: 'Cuota agosto pagada vía transferencia bancaria', receiptUrl: '' }
+            { id: 'am-1', date: '2026-08-05', amount: 15000, note: 'Cuota agosto pagada vía transferencia bancaria', receiptUrl: '' }
           ]
         },
         {
@@ -149,16 +155,16 @@ class AppState {
           creditorName: 'Don Aurelio (Prestamista Informal)',
           phone: '+1 (809) 555-9231',
           debtType: 'Prestamista Informal / Usura',
-          amountBorrowed: 1800,
-          amountOwed: 900,
+          amountBorrowed: 90000,
+          amountOwed: 45000,
           interestRate: '0% (Eliminado tras reunión familiar)',
           paymentFrequency: 'Quincenal',
           nextDueDate: '2026-08-30',
           priority: 'Alta',
           status: 'Al Día',
-          agreementTerms: 'Acuerdo firmado presencialmente con el responsable financiero: Cese inmediato de intereses abusivos. Se acordó liquidar el capital restante en 6 cuotas quincenales de $150 entregadas únicamente por Carlos Gómez.',
+          agreementTerms: 'Acuerdo firmado presencialmente con el responsable financiero: Cese inmediato de intereses abusivos. Se acordó liquidar el capital restante en 6 cuotas quincenales de RD$ 7,500 entregadas únicamente por Carlos Gómez.',
           amortizations: [
-            { id: 'am-2', date: '2026-08-15', amount: 150, note: 'Cuota quincena 1 agosto pagada con recibo físico', receiptUrl: '' }
+            { id: 'am-2', date: '2026-08-15', amount: 7500, note: 'Cuota quincena 1 agosto pagada con recibo físico', receiptUrl: '' }
           ]
         },
         {
@@ -166,16 +172,16 @@ class AppState {
           creditorName: 'Tío Roberto (Familiar)',
           phone: '+1 (809) 555-3412',
           debtType: 'Familiar / Amistad',
-          amountBorrowed: 1200,
-          amountOwed: 800,
+          amountBorrowed: 60000,
+          amountOwed: 35000,
           interestRate: '0%',
           paymentFrequency: 'Mensual',
           nextDueDate: '2026-09-15',
           priority: 'Media',
           status: 'Al Día',
-          agreementTerms: 'Acuerdo de transparencia familiar: Pago de $100 mensuales a partir de consolidar 30 días limpios de juego. Sin penalizaciones.',
+          agreementTerms: 'Acuerdo de transparencia familiar: Pago de RD$ 5,000 mensuales a partir de consolidar 30 días limpios de juego. Sin penalizaciones.',
           amortizations: [
-            { id: 'am-3', date: '2026-08-10', amount: 100, note: 'Abono mensual en cuenta', receiptUrl: '' }
+            { id: 'am-3', date: '2026-08-10', amount: 5000, note: 'Abono mensual en cuenta', receiptUrl: '' }
           ]
         }
       ],
@@ -183,19 +189,23 @@ class AppState {
       abcRecords: [
         {
           id: 'abc-1',
-          date: new Date(Date.now() - 86400000 * 2).toISOString(),
-          trigger: 'Recibí un mensaje de texto promocional de una casa de apuestas online mientras estaba solo en casa.',
-          irrationalThought: 'Si deposito solo $20, puedo recuperar lo del mes pasado rápidamente y nadie lo sabrá.',
-          rationalDebate: 'El juego nunca ha recuperado nada, solo ha destruido mis finanzas y la confianza familiar. Las probabilidades matemáticas siempre me dejarán en cero.',
-          alternativeBehavior: 'Eliminé y bloqueé el número, llamé a mi hermano Carlos y salí a caminar 25 minutos con mi perro.'
+          date: '2026-08-23T19:30:00Z',
+          antecedentTrigger: 'Recibí un bono laboral y me quedé solo en casa por la noche.',
+          irrationalThought: 'Si deposito solo RD$ 1,500, puedo multiplicar y recuperar lo del mes pasado rápidamente.',
+          rationalDebate: 'El juego tiene esperanza matemática negativa. Ninguna apuesta soluciona deudas pasadas, solo genera mayor ruina.',
+          healthyAlternativeAction: 'Llamé a mi hermano Carlos, transferí el dinero a la cuenta administrada y salí a correr.'
         }
       ],
 
-      contingencyContract: {
-        signed: true,
-        signDate: '2026-08-10',
-        termsAccepted: true
-      },
+      milestones: [
+        { id: 'm-1', days: 1, title: '24 Horas Limpio', icon: '🌱', desc: 'Primer día de blindaje consciente', unlocked: true },
+        { id: 'm-2', days: 7, title: '1 Semana Serena', icon: '🌿', desc: 'Desactivación inicial del circuito impulsivo', unlocked: true },
+        { id: 'm-3', days: 14, title: '2 Semanas Claras', icon: '🌳', desc: 'Consolidación de rutinas sin apuestas', unlocked: true },
+        { id: 'm-4', days: 30, title: '1 Mes Protector', icon: '🛡️', desc: 'Primera victoria de desensibilización dopaminérgica', unlocked: false },
+        { id: 'm-5', days: 90, title: '90 Días de Hábito', icon: '⭐', desc: 'Reestructuración cognitiva y control del córtex prefrontal', unlocked: false },
+        { id: 'm-6', days: 180, title: '6 Meses de Vida', icon: '💎', desc: 'Restauración vincular familiar y orden financiero', unlocked: false },
+        { id: 'm-7', days: 365, title: '1 Año de Libertad', icon: '👑', desc: 'Año completo en sobriedad y transformación vital', unlocked: false }
+      ],
 
       googleAuth: {
         isSignedIn: false,
@@ -209,22 +219,22 @@ class AppState {
     };
   }
 
-  saveState() {
-    try {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.state));
-      this.notifyListeners();
-    } catch (e) {
-      console.error('Error saving state:', e);
-    }
-  }
-
   getState() {
     return this.state;
   }
 
   setState(newState) {
     this.state = { ...this.state, ...newState };
-    this.saveState();
+    this.persist();
+    this.notify();
+  }
+
+  persist() {
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.state));
+    } catch (e) {
+      console.error('Error persisting app state:', e);
+    }
   }
 
   subscribe(listener) {
@@ -234,14 +244,18 @@ class AppState {
     };
   }
 
-  notifyListeners() {
-    this.listeners.forEach(fn => {
+  notify() {
+    this.listeners.forEach(listener => {
       try {
-        fn(this.state);
-      } catch (err) {
-        console.error('Listener callback error:', err);
+        listener(this.state);
+      } catch (e) {
+        console.error('State listener error:', e);
       }
     });
+  }
+
+  formatMoney(amount) {
+    return `RD$ ${Number(amount || 0).toLocaleString('es-DO')}`;
   }
 
   showToast(message, type = 'info') {
@@ -253,16 +267,17 @@ class AppState {
     
     let icon = 'ℹ️';
     if (type === 'success') icon = '✅';
+    if (type === 'error') icon = '❌';
     if (type === 'warning') icon = '⚠️';
-    if (type === 'error') icon = '🛑';
 
     toast.innerHTML = `<span>${icon}</span> <div>${message}</div>`;
     container.appendChild(toast);
 
     setTimeout(() => {
-      toast.style.animation = 'slideInRight 0.25s reverse forwards';
-      setTimeout(() => toast.remove(), 250);
-    }, 3800);
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
   }
 }
 

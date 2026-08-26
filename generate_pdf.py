@@ -368,8 +368,8 @@ def create_plan_pdf(output_path):
             Paragraph("Asignar nombres a los roles y marcar las tareas cumplidas en el tablero auditable.", td_style)
         ],
         [
-            Paragraph("<b>Módulo 3: Registro de Deudas & Finanzas</b>", td_bold_style),
-            Paragraph("Inventario de acreedores, sección del acuerdo pactado y presupuesto semanal.", td_style),
+            Paragraph("<b>Módulo 3: Registro de Deudas (DOP / RD$)</b>", td_bold_style),
+            Paragraph("Inventario de acreedores en RD$, sección del acuerdo pactado y presupuesto semanal (RD$ 6,000).", td_style),
             Paragraph("Documentar términos del acuerdo con cada prestamista y registrar abonos en tiempo real.", td_style)
         ],
         [

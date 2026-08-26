@@ -1,6 +1,6 @@
 /**
  * RUTA DE RECUPERACIÓN - DEBT REGISTRY & FINANCIAL AUDIT MODULE
- * Manages debt ledger, negotiated lender agreements, amortizations, and weekly cash budget
+ * Manages debt ledger in Dominican Pesos (RD$), negotiated lender agreements, amortizations, and weekly cash budget
  */
 
 class DebtsModule {
@@ -21,9 +21,9 @@ class DebtsModule {
     const oEl = document.getElementById('stat-total-owed');
     const pEl = document.getElementById('stat-total-paid');
 
-    if (bEl) bEl.textContent = `$${totalBorrowed.toLocaleString()}`;
-    if (oEl) oEl.textContent = `$${totalOwed.toLocaleString()}`;
-    if (pEl) pEl.textContent = `$${totalPaid.toLocaleString()}`;
+    if (bEl) bEl.textContent = `RD$ ${totalBorrowed.toLocaleString('es-DO')}`;
+    if (oEl) oEl.textContent = `RD$ ${totalOwed.toLocaleString('es-DO')}`;
+    if (pEl) pEl.textContent = `RD$ ${totalPaid.toLocaleString('es-DO')}`;
 
     if (window.chartRenderer) {
       window.chartRenderer.renderDebtProgress('debt-progress-container', totalBorrowed, totalOwed);
@@ -72,11 +72,11 @@ class DebtsModule {
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:10px;background:var(--surface-navy);padding:12px 14px;border-radius:var(--radius-md);margin-bottom:14px;">
             <div>
               <div style="font-size:11px;color:var(--text-dim);font-weight:600;">MONTO TOMADO</div>
-              <div style="font-size:15px;font-weight:700;color:#ffffff;">$${Number(d.amountBorrowed).toLocaleString()}</div>
+              <div style="font-size:15px;font-weight:700;color:#ffffff;">RD$ ${Number(d.amountBorrowed).toLocaleString('es-DO')}</div>
             </div>
             <div>
               <div style="font-size:11px;color:var(--text-dim);font-weight:600;">SALDO ADEUDADO</div>
-              <div style="font-size:16px;font-weight:800;color:var(--danger-crimson-light);">$${Number(d.amountOwed).toLocaleString()}</div>
+              <div style="font-size:16px;font-weight:800;color:var(--danger-crimson-light);">RD$ ${Number(d.amountOwed).toLocaleString('es-DO')}</div>
             </div>
             <div>
               <div style="font-size:11px;color:var(--text-dim);font-weight:600;">FRECUENCIA PAGO</div>
@@ -98,22 +98,35 @@ class DebtsModule {
             </p>
           </div>
 
-          <!-- Amortization Progress Bar -->
-          <div style="margin-bottom:12px;">
-            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-muted);margin-bottom:4px;">
-              <span>Progreso de Amortización: <b>${paidPct}%</b></span>
-              <span>Amortizado: <b>$${paidAmt.toLocaleString()}</b> de $${Number(d.amountBorrowed).toLocaleString()}</span>
+          <!-- PROGRESS BAR OF PAYMENT -->
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:4px;">
+              <span>Amortizado: <b>${paidPct}%</b> (RD$ ${paidAmt.toLocaleString('es-DO')})</span>
+              <span>Saldo: <b>RD$ ${Number(d.amountOwed).toLocaleString('es-DO')}</b></span>
             </div>
-            <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">
-              <div style="width:${paidPct}%;height:100%;background:linear-gradient(90deg, #0284c7, #10b981);border-radius:3px;"></div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" style="width: ${paidPct}%;"></div>
             </div>
           </div>
 
-          <!-- Card Actions -->
-          <div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-outline btn-sm" onclick="window.debtsModule.openAmortizeModal('${d.id}')">💵 Registrar Abono</button>
-            <button class="btn btn-outline btn-sm" onclick="window.debtsModule.openEditModal('${d.id}')">✏️ Editar / Acuerdo</button>
-            <button class="btn btn-outline btn-sm" onclick="window.debtsModule.deleteDebt('${d.id}')" style="color:#f87171;">🗑️</button>
+          <!-- AMORTIZATION HISTORY LIST -->
+          ${d.amortizations && d.amortizations.length > 0 ? `
+            <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;margin-bottom:12px;">
+              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px;">HISTORIAL DE ABONOS:</div>
+              ${d.amortizations.map(am => `
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,0.04);">
+                  <div>📅 ${am.date} &bull; ${am.note || 'Abono a capital'}</div>
+                  <div style="font-weight:700;color:var(--recovery-emerald-light);">+ RD$ ${Number(am.amount).toLocaleString('es-DO')}</div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          <!-- ACTIONS -->
+          <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" onclick="window.debtsModule.openEditDebtModal('${d.id}')">✏️ Editar Términos</button>
+            <button class="btn btn-success btn-sm" onclick="window.debtsModule.openAmortizeModal('${d.id}')">💵 Registrar Abono</button>
+            <button class="btn btn-danger btn-sm" onclick="window.debtsModule.deleteDebt('${d.id}')">🗑️ Eliminar</button>
           </div>
         </div>
       `;
@@ -121,170 +134,186 @@ class DebtsModule {
   }
 
   openNewDebtModal() {
+    document.getElementById('debt-modal-title').textContent = 'Registrar Nueva Deuda y Acuerdo';
     document.getElementById('debt-form-id').value = '';
     document.getElementById('debt-creditor-input').value = '';
     document.getElementById('debt-phone-input').value = '';
     document.getElementById('debt-type-select').value = 'Entidad Bancaria / Tarjeta';
+    document.getElementById('debt-priority-select').value = 'Alta';
     document.getElementById('debt-borrowed-input').value = '';
     document.getElementById('debt-owed-input').value = '';
-    document.getElementById('debt-rate-input').value = '0%';
+    document.getElementById('debt-rate-input').value = '0% (Congelado)';
     document.getElementById('debt-freq-select').value = 'Mensual';
     document.getElementById('debt-due-input').value = '';
-    document.getElementById('debt-priority-select').value = 'Alta';
     document.getElementById('debt-agreement-input').value = '';
-    
-    document.getElementById('debt-modal-title').textContent = 'Registrar Nueva Deuda y Acuerdo';
-    document.getElementById('debt-modal').classList.add('active');
+
+    const modal = document.getElementById('debt-modal');
+    if (modal) modal.classList.add('active');
   }
 
-  openEditModal(debtId) {
+  openEditDebtModal(debtId) {
     const state = window.appState.getState();
-    const d = state.debts.find(item => item.id === debtId);
-    if (!d) return;
+    const debt = (state.debts || []).find(d => d.id === debtId);
+    if (!debt) return;
 
-    document.getElementById('debt-form-id').value = d.id;
-    document.getElementById('debt-creditor-input').value = d.creditorName;
-    document.getElementById('debt-phone-input').value = d.phone || '';
-    document.getElementById('debt-type-select').value = d.debtType;
-    document.getElementById('debt-borrowed-input').value = d.amountBorrowed;
-    document.getElementById('debt-owed-input').value = d.amountOwed;
-    document.getElementById('debt-rate-input').value = d.interestRate || '';
-    document.getElementById('debt-freq-select').value = d.paymentFrequency;
-    document.getElementById('debt-due-input').value = d.nextDueDate || '';
-    document.getElementById('debt-priority-select').value = d.priority;
-    document.getElementById('debt-agreement-input').value = d.agreementTerms || '';
+    document.getElementById('debt-modal-title').textContent = `Editar Deuda: ${debt.creditorName}`;
+    document.getElementById('debt-form-id').value = debt.id;
+    document.getElementById('debt-creditor-input').value = debt.creditorName || '';
+    document.getElementById('debt-phone-input').value = debt.phone || '';
+    document.getElementById('debt-type-select').value = debt.debtType || 'Entidad Bancaria / Tarjeta';
+    document.getElementById('debt-priority-select').value = debt.priority || 'Alta';
+    document.getElementById('debt-borrowed-input').value = debt.amountBorrowed || '';
+    document.getElementById('debt-owed-input').value = debt.amountOwed || '';
+    document.getElementById('debt-rate-input').value = debt.interestRate || '';
+    document.getElementById('debt-freq-select').value = debt.paymentFrequency || 'Mensual';
+    document.getElementById('debt-due-input').value = debt.nextDueDate || '';
+    document.getElementById('debt-agreement-input').value = debt.agreementTerms || '';
 
-    document.getElementById('debt-modal-title').textContent = 'Editar Deuda y Acuerdo Pactado';
-    document.getElementById('debt-modal').classList.add('active');
+    const modal = document.getElementById('debt-modal');
+    if (modal) modal.classList.add('active');
   }
 
   closeDebtModal() {
-    document.getElementById('debt-modal').classList.remove('active');
+    const modal = document.getElementById('debt-modal');
+    if (modal) modal.classList.remove('active');
   }
 
   saveDebt() {
     const id = document.getElementById('debt-form-id').value;
-    const creditor = document.getElementById('debt-creditor-input').value.trim();
+    const creditorName = document.getElementById('debt-creditor-input').value.trim();
     const phone = document.getElementById('debt-phone-input').value.trim();
-    const type = document.getElementById('debt-type-select').value;
-    const borrowed = Number(document.getElementById('debt-borrowed-input').value) || 0;
-    const owed = Number(document.getElementById('debt-owed-input').value) || 0;
-    const rate = document.getElementById('debt-rate-input').value.trim();
-    const freq = document.getElementById('debt-freq-select').value;
-    const dueDate = document.getElementById('debt-due-input').value;
+    const debtType = document.getElementById('debt-type-select').value;
     const priority = document.getElementById('debt-priority-select').value;
-    const agreement = document.getElementById('debt-agreement-input').value.trim();
+    const amountBorrowed = Number(document.getElementById('debt-borrowed-input').value);
+    const amountOwed = Number(document.getElementById('debt-owed-input').value);
+    const interestRate = document.getElementById('debt-rate-input').value.trim();
+    const paymentFrequency = document.getElementById('debt-freq-select').value;
+    const nextDueDate = document.getElementById('debt-due-input').value;
+    const agreementTerms = document.getElementById('debt-agreement-input').value.trim();
 
-    if (!creditor || borrowed <= 0) {
-      alert('Por favor ingresa el nombre del acreedor y el monto original tomado prestado.');
+    if (!creditorName || isNaN(amountBorrowed) || isNaN(amountOwed)) {
+      window.appState.showToast('Por favor completa el nombre del acreedor y los montos en RD$.', 'warning');
       return;
     }
 
     const state = window.appState.getState();
-    let debts = [...state.debts];
+    let debts = [...(state.debts || [])];
 
     if (id) {
-      // Edit existing
+      // Edit
       debts = debts.map(d => {
         if (d.id === id) {
           return {
             ...d,
-            creditorName: creditor,
+            creditorName,
             phone,
-            debtType: type,
-            amountBorrowed: borrowed,
-            amountOwed: owed,
-            interestRate: rate,
-            paymentFrequency: freq,
-            nextDueDate: dueDate,
+            debtType,
             priority,
-            agreementTerms: agreement,
-            status: owed <= 0 ? 'Liquidada' : d.status
+            amountBorrowed,
+            amountOwed,
+            interestRate,
+            paymentFrequency,
+            nextDueDate,
+            agreementTerms,
+            status: amountOwed === 0 ? 'Liquidada' : d.status
           };
         }
         return d;
       });
-      window.appState.showToast('Deuda y acuerdo actualizados.', 'success');
     } else {
-      // Create new
-      debts.push({
+      // Create
+      const newDebt = {
         id: 'd-' + Date.now(),
-        creditorName: creditor,
+        creditorName,
         phone,
-        debtType: type,
-        amountBorrowed: borrowed,
-        amountOwed: owed,
-        interestRate: rate,
-        paymentFrequency: freq,
-        nextDueDate: dueDate,
+        debtType,
         priority,
-        status: owed <= 0 ? 'Liquidada' : 'Al Día',
-        agreementTerms: agreement,
+        amountBorrowed,
+        amountOwed,
+        interestRate,
+        paymentFrequency,
+        nextDueDate,
+        agreementTerms,
+        status: 'Al Día',
         amortizations: []
-      });
-      window.appState.showToast('Nueva deuda registrada en el libro maestro.', 'success');
+      };
+      debts.push(newDebt);
     }
 
     window.appState.setState({ debts });
     this.closeDebtModal();
     this.renderDebtsList();
     this.renderFinancialSummary();
+    window.appState.showToast('Deuda y acuerdo guardados exitosamente.', 'success');
+
+    // Auto-sync
+    if (window.googleAuth && window.googleAuth.accessToken) {
+      window.googleAuth.triggerInitialSync();
+    }
   }
 
   deleteDebt(debtId) {
     if (!confirm('¿Estás seguro de eliminar este registro de deuda?')) return;
+
     const state = window.appState.getState();
-    const debts = state.debts.filter(d => d.id !== debtId);
+    const debts = (state.debts || []).filter(d => d.id !== debtId);
+
     window.appState.setState({ debts });
     this.renderDebtsList();
     this.renderFinancialSummary();
-    window.appState.showToast('Deuda eliminada del registro.', 'info');
+    window.appState.showToast('Deuda eliminada del inventario.', 'info');
+
+    // Auto-sync
+    if (window.googleAuth && window.googleAuth.accessToken) {
+      window.googleAuth.triggerInitialSync();
+    }
   }
 
-  // --- AMORTIZATION LOGIC ---
   openAmortizeModal(debtId) {
     const state = window.appState.getState();
-    const d = state.debts.find(item => item.id === debtId);
-    if (!d) return;
+    const debt = (state.debts || []).find(d => d.id === debtId);
+    if (!debt) return;
 
-    document.getElementById('amortize-debt-id').value = d.id;
-    document.getElementById('amortize-creditor-name').textContent = d.creditorName;
-    document.getElementById('amortize-current-owed').textContent = `$${Number(d.amountOwed).toLocaleString()}`;
+    document.getElementById('amortize-debt-id').value = debt.id;
+    document.getElementById('amortize-creditor-name').textContent = debt.creditorName;
+    document.getElementById('amortize-current-owed').textContent = `RD$ ${Number(debt.amountOwed).toLocaleString('es-DO')}`;
     document.getElementById('amortize-amount-input').value = '';
     document.getElementById('amortize-note-input').value = '';
 
-    document.getElementById('amortize-modal').classList.add('active');
+    const modal = document.getElementById('amortize-modal');
+    if (modal) modal.classList.add('active');
   }
 
   closeAmortizeModal() {
-    document.getElementById('amortize-modal').classList.remove('active');
+    const modal = document.getElementById('amortize-modal');
+    if (modal) modal.classList.remove('active');
   }
 
   saveAmortization() {
     const debtId = document.getElementById('amortize-debt-id').value;
-    const amount = Number(document.getElementById('amortize-amount-input').value) || 0;
+    const amount = Number(document.getElementById('amortize-amount-input').value);
     const note = document.getElementById('amortize-note-input').value.trim();
 
-    if (amount <= 0) {
-      alert('Por favor ingresa un monto válido de abono.');
+    if (isNaN(amount) || amount <= 0) {
+      window.appState.showToast('Ingresa un monto de abono válido en RD$.', 'warning');
       return;
     }
 
     const state = window.appState.getState();
-    const debts = state.debts.map(d => {
+    const debts = (state.debts || []).map(d => {
       if (d.id === debtId) {
         const newOwed = Math.max(0, Number(d.amountOwed) - amount);
-        const newAmort = {
+        const newAmortization = {
           id: 'am-' + Date.now(),
           date: new Date().toISOString().split('T')[0],
           amount: amount,
-          note: note
+          note: note || 'Abono realizado por el Responsable Financiero'
         };
         return {
           ...d,
           amountOwed: newOwed,
-          status: newOwed === 0 ? 'Liquidada' : d.status,
-          amortizations: [...(d.amortizations || []), newAmort]
+          status: newOwed === 0 ? 'Liquidada' : 'Al Día',
+          amortizations: [...(d.amortizations || []), newAmortization]
         };
       }
       return d;
@@ -294,8 +323,12 @@ class DebtsModule {
     this.closeAmortizeModal();
     this.renderDebtsList();
     this.renderFinancialSummary();
-    window.soundSynth.playMilestoneChime();
-    window.appState.showToast(`¡Abono de $${amount.toLocaleString()} registrado con éxito!`, 'success');
+    window.appState.showToast('¡Abono registrado y saldo recalculado!', 'success');
+
+    // Auto-sync
+    if (window.googleAuth && window.googleAuth.accessToken) {
+      window.googleAuth.triggerInitialSync();
+    }
   }
 }
 

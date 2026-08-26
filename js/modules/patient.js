@@ -1,6 +1,6 @@
 /**
  * RUTA DE RECUPERACIÓN - PATIENT & PROGRESS MODULE
- * Handles live recovery clock, daily craving check-in, savings calculator, and milestone badges
+ * Handles live recovery clock, daily craving check-in, savings calculator (DOP), and milestone badges
  */
 
 class PatientModule {
@@ -45,8 +45,8 @@ class PatientModule {
     if (mEl) mEl.textContent = String(minutes).padStart(2, '0');
     if (sEl) sEl.textContent = String(seconds).padStart(2, '0');
 
-    // Update estimated money and time saved
-    const dailyGambling = state.patient.dailyGamblingAvg || 65;
+    // Update estimated money and time saved in Pesos Dominicanos (RD$)
+    const dailyGambling = state.patient.dailyGamblingAvg || 3500;
     const dailyHours = state.patient.dailyHoursAvg || 3.5;
     const totalDaysFloat = totalSeconds / 86400;
 
@@ -56,24 +56,19 @@ class PatientModule {
     const moneyEl = document.getElementById('metric-money-saved');
     const hoursEl = document.getElementById('metric-hours-saved');
 
-    if (moneyEl) moneyEl.textContent = `$${moneySaved.toLocaleString()}`;
+    if (moneyEl) moneyEl.textContent = `RD$ ${moneySaved.toLocaleString('es-DO')}`;
     if (hoursEl) hoursEl.textContent = `${hoursSaved.toLocaleString()} hrs`;
-
-    // Update patient object in state without triggering continuous redraw
-    state.patient.daysClean = days;
-    state.patient.moneySavedEstimated = moneySaved;
-    state.patient.hoursSavedEstimated = hoursSaved;
   }
 
   renderHeroStats() {
     const state = window.appState.getState();
-    const patientNameEl = document.getElementById('hero-patient-name');
-    const patientStatusEl = document.getElementById('hero-patient-status');
-    const patientAvatarEl = document.getElementById('hero-patient-avatar');
+    const nameEl = document.getElementById('hero-patient-name');
+    const statusEl = document.getElementById('hero-patient-status');
+    const avatarEl = document.getElementById('hero-patient-avatar');
 
-    if (patientNameEl) patientNameEl.textContent = state.patient.name;
-    if (patientStatusEl) patientStatusEl.textContent = `${state.patient.status} • Contacto: ${state.patient.emergencyContact}`;
-    if (patientAvatarEl) patientAvatarEl.textContent = state.patient.name.charAt(0).toUpperCase();
+    if (nameEl) nameEl.textContent = state.patient.name;
+    if (statusEl) statusEl.textContent = `${state.patient.status} • Contacto: ${state.patient.emergencyContact}`;
+    if (avatarEl) avatarEl.textContent = (state.patient.name || 'P').charAt(0).toUpperCase();
   }
 
   renderMilestones() {
@@ -81,25 +76,21 @@ class PatientModule {
     if (!container) return;
 
     const state = window.appState.getState();
-    const days = state.patient.daysClean || 0;
+    const startDate = new Date(state.patient.abstinenceStartDate);
+    const daysClean = Math.floor((new Date() - startDate) / 86400000);
 
-    const badges = [
-      { id: 'b-24h', name: 'Primeras 24 Horas', desc: 'Paso 1: Contención inicial', reqDays: 1, icon: '🌱' },
-      { id: 'b-1w', name: '1 Semana Limpia', desc: 'Desintoxicación dopaminérgica', reqDays: 7, icon: '🌿' },
-      { id: 'b-2w', name: '2 Semanas', desc: 'Estabilidad y rutina familiar', reqDays: 14, icon: '🛡️' },
-      { id: 'b-1m', name: '1 Mes de Claridad', desc: 'Freno a la caza de pérdidas', reqDays: 30, icon: '⭐' },
-      { id: 'b-90d', name: '90 Días de Libertad', desc: 'Reconfiguración de hábitos', reqDays: 90, icon: '💎' },
-      { id: 'b-6m', name: '6 Meses', desc: 'Rehabilitación y autonomía', reqDays: 180, icon: '🏆' },
-      { id: 'b-1y', name: '1 Año de Renacimiento', desc: 'Proyecto vital consolidado', reqDays: 365, icon: '👑' }
-    ];
-
-    container.innerHTML = badges.map(b => {
-      const isUnlocked = days >= b.reqDays;
+    const milestones = state.milestones || [];
+    container.innerHTML = milestones.map(m => {
+      const isUnlocked = daysClean >= m.days;
       return `
-        <div class="milestone-badge ${isUnlocked ? 'unlocked' : ''}">
-          <div class="badge-icon-wrap">${b.icon}</div>
-          <div class="badge-name">${b.name}</div>
-          <div class="badge-desc">${isUnlocked ? '¡Desbloqueado!' : `Meta: ${b.reqDays} días`}</div>
+        <div class="milestone-badge ${isUnlocked ? 'unlocked' : 'locked'}">
+          <div class="badge-icon">${m.icon}</div>
+          <div class="badge-title">${m.title}</div>
+          <div class="badge-days">${m.days} ${m.days === 1 ? 'día' : 'días'} sin jugar</div>
+          <div class="badge-desc">${m.desc}</div>
+          <span class="badge ${isUnlocked ? 'badge-emerald' : 'badge-blue'}" style="margin-top:6px;font-size:10px;">
+            ${isUnlocked ? '✓ Desbloqueado' : '⏳ En progreso'}
+          </span>
         </div>
       `;
     }).join('');
@@ -108,7 +99,7 @@ class PatientModule {
   renderCravingChart() {
     const state = window.appState.getState();
     if (window.chartRenderer) {
-      window.chartRenderer.renderCravingChart('craving-chart-container', state.cravingHistory);
+      window.chartRenderer.renderCravingTrend('craving-chart-container', state.cravingHistory || []);
     }
   }
 
@@ -118,18 +109,12 @@ class PatientModule {
 
     if (slider && badge) {
       slider.addEventListener('input', (e) => {
-        const val = e.target.value;
+        const val = Number(e.target.value);
         badge.textContent = `${val} / 10`;
-        if (val >= 7) {
-          badge.style.background = 'var(--danger-crimson)';
-          badge.style.color = '#ffffff';
-        } else if (val >= 4) {
-          badge.style.background = 'var(--warning-amber)';
-          badge.style.color = '#0f172a';
-        } else {
-          badge.style.background = 'var(--recovery-emerald)';
-          badge.style.color = '#ffffff';
-        }
+        badge.className = 'slider-val-badge';
+        if (val <= 3) badge.classList.add('low');
+        else if (val <= 6) badge.classList.add('mid');
+        else badge.classList.add('high');
       });
     }
   }
@@ -145,39 +130,36 @@ class PatientModule {
   }
 
   saveCheckin() {
-    const slider = document.getElementById('checkin-craving-slider');
-    const moodSelect = document.getElementById('checkin-mood-select');
-    const sleepInput = document.getElementById('checkin-sleep-input');
-    const notesInput = document.getElementById('checkin-notes-input');
+    const craving = Number(document.getElementById('checkin-craving-slider').value);
+    const mood = document.getElementById('checkin-mood-select').value;
+    const sleepHours = Number(document.getElementById('checkin-sleep-input').value);
+    const notes = document.getElementById('checkin-notes-input').value.trim();
 
-    // Trigger checkboxes
-    const triggerBoxes = document.querySelectorAll('input[name="checkin-trigger"]:checked');
-    const triggers = Array.from(triggerBoxes).map(b => b.value);
+    const checkboxes = document.querySelectorAll('input[name="checkin-trigger"]:checked');
+    const triggers = Array.from(checkboxes).map(cb => cb.value);
 
-    const cravingVal = Number(slider.value);
-    const newCheckin = {
+    const newRecord = {
       id: 'cr-' + Date.now(),
       date: new Date().toISOString(),
-      craving: cravingVal,
-      mood: moodSelect.value,
-      sleepHours: Number(sleepInput.value) || 7,
+      craving: craving,
+      mood: mood,
+      sleepHours: sleepHours,
       triggers: triggers,
-      notes: notesInput.value.trim()
+      notes: notes
     };
 
     const state = window.appState.getState();
-    const updatedHistory = [...state.cravingHistory, newCheckin];
+    const updatedHistory = [...(state.cravingHistory || []), newRecord];
+
     window.appState.setState({ cravingHistory: updatedHistory });
 
     this.closeCheckinModal();
     this.renderCravingChart();
     window.appState.showToast('¡Check-in diario registrado exitosamente!', 'success');
 
-    // If craving is high, suggest Urge Surfing
-    if (cravingVal >= 6) {
-      if (confirm('Se detectó un nivel de deseo elevado. ¿Deseas iniciar ahora el ejercicio guiado de Urge Surfing para surfear el impulso?')) {
-        window.exercisesModule.startUrgeSurfing();
-      }
+    // Auto-sync if signed in with Google
+    if (window.googleAuth && window.googleAuth.accessToken) {
+      window.googleAuth.triggerInitialSync();
     }
   }
 }

@@ -100,11 +100,11 @@ La aplicación genera y actualiza en tiempo real una hoja de cálculo denominada
 
 ---
 
-### MÓDULO 3: Registro y Gestión Estructurada de Deudas y Finanzas
-- Inventario completo de acreedores, categorías, montos prestados y saldos actuales.
+### MÓDULO 3: Registro y Gestión Estructurada de Deudas y Finanzas (Moneda: DOP / RD$)
+- Inventario completo de acreedores, categorías, montos prestados y saldos actuales en Pesos Dominicanos.
 - **Espacio Extenso y Destacado para el Acuerdo Pactado con el Prestamista:** Términos acordados, quitas, congelación de intereses y familiar financiero garante.
 - Registro de amortizaciones con recálculo en vivo y gráfico de progreso.
-- Presupuesto semanal supervisado en efectivo ($120/semana).
+- Presupuesto semanal supervisado en efectivo (RD$ 6,000 / semana).
 
 ---
 
