@@ -47,6 +47,12 @@ class GoogleAuthManager {
       return;
     }
 
+    if (window.location.protocol === 'file:') {
+      window.appState.showToast('La autenticación de Google requiere un servidor web (http://localhost) y no funciona en archivos locales (file://). Usa la Opción 1 (Modo Prueba).', 'error');
+      this.showSetupModal();
+      return;
+    }
+
     if (window.google && window.google.accounts && window.google.accounts.oauth2) {
       try {
         this.tokenClient = google.accounts.oauth2.initTokenClient({
@@ -81,7 +87,7 @@ class GoogleAuthManager {
         this.showSetupModal();
       }
     } else {
-      window.appState.showToast('El servicio de Google Identity se está cargando. Intenta de nuevo en unos segundos.', 'info');
+      window.appState.showToast('El SDK de Google Identity no pudo cargar. Si estás en modo local (file://), usa la opción de conexión rápida (Demo).', 'warning');
       this.showSetupModal();
     }
   }
