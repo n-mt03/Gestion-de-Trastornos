@@ -237,6 +237,11 @@ class AppState {
     }
   }
 
+  saveState() {
+    this.persist();
+    this.notify();
+  }
+
   subscribe(listener) {
     this.listeners.push(listener);
     return () => {

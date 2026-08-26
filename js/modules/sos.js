@@ -4,7 +4,7 @@
  */
 
 class SosModule {
-  openSosModal() {
+  renderSosDetails() {
     const state = window.appState.getState();
     const companionName = state.patient.guardCompanion || 'Acompañante de Guardia';
     const companionPhone = state.patient.guardCompanionPhone || '';
@@ -17,7 +17,10 @@ class SosModule {
     if (nameEl) nameEl.textContent = companionName;
     if (callLink) callLink.href = companionPhone ? `tel:${companionPhone}` : '#';
     if (waLink) waLink.href = companionWhatsapp ? `https://wa.me/${companionWhatsapp}?text=Hola,%20estoy%20experimentando%20un%20impulso%20fuerte%20de%20jugar%20y%20necesito%20acompañamiento%20(Ruta%20de%20Recuperación).` : '#';
+  }
 
+  openSosModal() {
+    this.renderSosDetails();
     const modal = document.getElementById('sos-modal');
     if (modal) modal.classList.add('active');
   }

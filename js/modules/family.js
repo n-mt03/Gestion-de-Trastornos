@@ -14,7 +14,7 @@ class FamilyModule {
     if (!container) return;
 
     const state = window.appState.getState();
-    const roles = state.familyRoles;
+    const roles = state.familyRoles || [];
 
     const roleClassMap = {
       'coord': 'role-coord',
@@ -59,7 +59,7 @@ class FamilyModule {
     const state = window.appState.getState();
     const rows = [];
 
-    state.familyRoles.forEach(r => {
+    (state.familyRoles || []).forEach(r => {
       (r.tasks || []).forEach(t => {
         rows.push({
           roleId: r.id,
@@ -74,7 +74,7 @@ class FamilyModule {
     });
 
     if (rows.length === 0) {
-      container.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No hay tareas familiares asignadas. Haz clic en "Nueva Tarea" para agregar una.</td></tr>`;
+      container.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">No hay tareas familiares asignadas. Haz clic en "Nueva Tarea" para agregar una.</td></tr>`;
       return;
     }
 
@@ -90,7 +90,7 @@ class FamilyModule {
         </td>
         <td>
           <span class="badge badge-gray">${item.roleTitle}</span>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${item.memberName}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${item.memberName || 'Sin asignar'}</div>
         </td>
         <td>${item.dueDate || 'Sin fecha'}</td>
         <td>
@@ -102,32 +102,52 @@ class FamilyModule {
 
   toggleTask(roleId, taskId) {
     const state = window.appState.getState();
-    const role = state.familyRoles.find(r => r.id === roleId);
-    if (!role) return;
-
-    const task = (role.tasks || []).find(t => t.id === taskId);
-    if (task) {
-      task.done = !task.done;
-      window.appState.saveState();
-      this.renderRolesGrid();
-      this.renderTasksBoard();
-      if (task.done) {
-        window.soundSynth.playMilestoneChime();
-        window.appState.showToast('Compromiso familiar completado y verificado.', 'success');
+    const updatedRoles = (state.familyRoles || []).map(role => {
+      if (role.id === roleId) {
+        const updatedTasks = (role.tasks || []).map(t => {
+          if (t.id === taskId) {
+            return { ...t, done: !t.done };
+          }
+          return t;
+        });
+        return { ...role, tasks: updatedTasks };
       }
+      return role;
+    });
+
+    window.appState.setState({ familyRoles: updatedRoles });
+    this.renderRolesGrid();
+    this.renderTasksBoard();
+
+    if (window.soundSynth) {
+      window.soundSynth.playMilestoneChime();
+    }
+    window.appState.showToast('Estado de tarea familiar actualizado.', 'success');
+
+    // Auto-sync
+    if (window.googleAuth && window.googleAuth.accessToken) {
+      window.googleAuth.triggerInitialSync();
     }
   }
 
   deleteTask(roleId, taskId) {
     if (!confirm('¿Deseas eliminar esta tarea familiar?')) return;
     const state = window.appState.getState();
-    const role = state.familyRoles.find(r => r.id === roleId);
-    if (role) {
-      role.tasks = (role.tasks || []).filter(t => t.id !== taskId);
-      window.appState.saveState();
-      this.renderRolesGrid();
-      this.renderTasksBoard();
-      window.appState.showToast('Tarea eliminada.', 'info');
+    const updatedRoles = (state.familyRoles || []).map(role => {
+      if (role.id === roleId) {
+        return { ...role, tasks: (role.tasks || []).filter(t => t.id !== taskId) };
+      }
+      return role;
+    });
+
+    window.appState.setState({ familyRoles: updatedRoles });
+    this.renderRolesGrid();
+    this.renderTasksBoard();
+    window.appState.showToast('Tarea eliminada.', 'info');
+
+    // Auto-sync
+    if (window.googleAuth && window.googleAuth.accessToken) {
+      window.googleAuth.triggerInitialSync();
     }
   }
 
@@ -135,8 +155,8 @@ class FamilyModule {
     const select = document.getElementById('task-role-select');
     if (select) {
       const state = window.appState.getState();
-      select.innerHTML = state.familyRoles.map(r => `
-        <option value="${r.id}">${r.roleTitle} (${r.memberName || 'Sin nombre'})</option>
+      select.innerHTML = (state.familyRoles || []).map(r => `
+        <option value="${r.id}">${r.roleTitle} (${r.memberName || 'Sin asignar'})</option>
       `).join('');
     }
     const modal = document.getElementById('add-task-modal');
@@ -154,35 +174,47 @@ class FamilyModule {
     const dueDate = document.getElementById('task-due-input').value;
 
     if (!text) {
-      alert('Por favor ingresa la descripción de la tarea.');
+      window.appState.showToast('Por favor ingresa la descripción de la tarea.', 'warning');
       return;
     }
 
     const state = window.appState.getState();
-    const role = state.familyRoles.find(r => r.id === roleId);
-    if (role) {
-      role.tasks = role.tasks || [];
-      role.tasks.push({
-        id: 't-' + Date.now(),
-        text: text,
-        dueDate: dueDate || '',
-        done: false
-      });
-      window.appState.saveState();
-      this.closeAddTaskModal();
-      this.renderRolesGrid();
-      this.renderTasksBoard();
-      window.appState.showToast('Nueva tarea familiar asignada.', 'success');
+    const updatedRoles = (state.familyRoles || []).map(role => {
+      if (role.id === roleId) {
+        const newTask = {
+          id: 't-' + Date.now(),
+          text: text,
+          dueDate: dueDate || '',
+          done: false
+        };
+        return { ...role, tasks: [...(role.tasks || []), newTask] };
+      }
+      return role;
+    });
+
+    window.appState.setState({ familyRoles: updatedRoles });
+    this.closeAddTaskModal();
+    this.renderRolesGrid();
+    this.renderTasksBoard();
+    window.appState.showToast('Nueva tarea familiar asignada.', 'success');
+
+    // Clear input
+    document.getElementById('task-text-input').value = '';
+    document.getElementById('task-due-input').value = '';
+
+    // Auto-sync
+    if (window.googleAuth && window.googleAuth.accessToken) {
+      window.googleAuth.triggerInitialSync();
     }
   }
 
   editRole(roleId) {
     const state = window.appState.getState();
-    const role = state.familyRoles.find(r => r.id === roleId);
+    const role = (state.familyRoles || []).find(r => r.id === roleId);
     if (!role) return;
 
     document.getElementById('edit-role-id').value = role.id;
-    document.getElementById('edit-role-title').textContent = role.roleTitle;
+    document.getElementById('edit-role-title').textContent = `${role.roleTitle} (Rol ${role.roleCode})`;
     document.getElementById('edit-role-name').value = role.memberName || '';
     document.getElementById('edit-role-relation').value = role.relation || '';
     document.getElementById('edit-role-phone').value = role.phone || '';
@@ -202,24 +234,57 @@ class FamilyModule {
     const relation = document.getElementById('edit-role-relation').value.trim();
     const phone = document.getElementById('edit-role-phone').value.trim();
 
+    if (!name) {
+      window.appState.showToast('Por favor escribe el nombre del familiar responsable.', 'warning');
+      return;
+    }
+
     const state = window.appState.getState();
-    const role = state.familyRoles.find(r => r.id === roleId);
-    if (role) {
-      role.memberName = name;
-      role.relation = relation;
-      role.phone = phone;
+    let patientUpdate = { ...state.patient };
 
-      // Update emergency contacts if relevant
-      if (role.id === 'risk') {
-        state.patient.guardCompanion = name;
-        state.patient.guardCompanionPhone = phone;
+    const updatedRoles = (state.familyRoles || []).map(role => {
+      if (role.id === roleId) {
+        // Update emergency contacts if coordinator or cotherapist companion
+        if (role.id === 'coord') {
+          patientUpdate.emergencyContact = `${name} (${relation || 'Coordinador'}) - ${phone || ''}`;
+        } else if (role.id === 'risk') {
+          patientUpdate.guardCompanion = `${name} (${relation || 'Acompañante'})`;
+          patientUpdate.guardCompanionPhone = phone;
+          const cleanWa = phone.replace(/[^0-9]/g, '');
+          patientUpdate.guardCompanionWhatsapp = cleanWa || '18095550144';
+        }
+        return {
+          ...role,
+          memberName: name,
+          relation: relation || 'Familiar',
+          phone: phone || ''
+        };
       }
+      return role;
+    });
 
-      window.appState.saveState();
-      this.closeEditRoleModal();
-      this.renderRolesGrid();
-      this.renderTasksBoard();
-      window.appState.showToast('Asignación de rol familiar actualizada.', 'success');
+    window.appState.setState({
+      familyRoles: updatedRoles,
+      patient: patientUpdate
+    });
+
+    this.closeEditRoleModal();
+    this.renderRolesGrid();
+    this.renderTasksBoard();
+
+    // Update SOS module details and hero pill
+    if (window.sosModule && window.sosModule.renderSosDetails) {
+      window.sosModule.renderSosDetails();
+    }
+    if (window.patientModule && window.patientModule.renderHeroStats) {
+      window.patientModule.renderHeroStats();
+    }
+
+    window.appState.showToast(`¡Rol '${name}' guardado correctamente!`, 'success');
+
+    // Auto-sync
+    if (window.googleAuth && window.googleAuth.accessToken) {
+      window.googleAuth.triggerInitialSync();
     }
   }
 }
