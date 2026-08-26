@@ -1,6 +1,6 @@
 /**
  * RUTA DE RECUPERACIÓN - GOOGLE OAUTH 2.0 & IDENTITY SERVICES
- * Handles secure Google Sign-In, Token Lifecycle, Scope Permissions, and Graceful Fallback
+ * Handles secure Google Sign-In with Native Account Selector (prompt: select_account)
  */
 
 class GoogleAuthManager {
@@ -38,11 +38,11 @@ class GoogleAuthManager {
   }
 
   /**
-   * Triggers Google OAuth 2.0 Token flow
+   * Triggers the official Google OAuth 2.0 popup with native Account Selector
    */
   signIn() {
-    // If no custom Client ID is set yet, show the setup modal with instructions and demo option
-    if (!this.clientId || this.clientId.includes('demo')) {
+    // If no Client ID has been configured yet, show the setup dialog
+    if (!this.clientId) {
       this.showSetupModal();
       return;
     }
@@ -55,7 +55,7 @@ class GoogleAuthManager {
           callback: (response) => {
             if (response.error !== undefined) {
               console.error('Google Auth Error:', response);
-              window.appState.showToast('Error de autorización: ' + (response.error_description || response.error), 'error');
+              window.appState.showToast('Error de autorización de Google: ' + (response.error_description || response.error), 'error');
               this.showSetupModal();
               return;
             }
@@ -66,20 +66,22 @@ class GoogleAuthManager {
             localStorage.setItem('google_access_token', this.accessToken);
             localStorage.setItem('google_token_expiry', this.tokenExpiry);
 
-            window.appState.showToast('¡Autenticado con Google exitosamente!', 'success');
+            window.appState.showToast('¡Cuenta de Google conectada exitosamente!', 'success');
             this.fetchUserProfile();
             this.triggerInitialSync();
             this.closeSetupModal();
           },
         });
-        this.tokenClient.requestAccessToken({ prompt: 'consent' });
+
+        // Open official Google popup with account selector (select_account)
+        this.tokenClient.requestAccessToken({ prompt: 'select_account' });
       } catch (err) {
         console.warn('GIS Token client error:', err);
-        window.appState.showToast('Error inicializando el cliente de Google. Revisa tu Client ID.', 'error');
+        window.appState.showToast('Error al abrir la ventana de Google. Revisa tu Client ID.', 'error');
         this.showSetupModal();
       }
     } else {
-      window.appState.showToast('Google Identity SDK no cargó. Modo sin conexión activado.', 'warning');
+      window.appState.showToast('El servicio de Google Identity se está cargando. Intenta de nuevo en unos segundos.', 'info');
       this.showSetupModal();
     }
   }
@@ -88,7 +90,7 @@ class GoogleAuthManager {
     const input = document.getElementById('google-client-id-input');
     const val = input ? input.value.trim() : '';
     if (!val) {
-      window.appState.showToast('Ingresa un Client ID de Google Cloud Console válido.', 'warning');
+      window.appState.showToast('Por favor pega el Client ID generado en Google Cloud Console.', 'warning');
       return;
     }
     this.setClientId(val);
@@ -148,7 +150,7 @@ class GoogleAuthManager {
     });
 
     this.updateSyncUI();
-    window.appState.showToast('Sesión de Google cerrada. Modo local activado.', 'info');
+    window.appState.showToast('Sesión de Google cerrada.', 'info');
   }
 
   async fetchUserProfile() {
