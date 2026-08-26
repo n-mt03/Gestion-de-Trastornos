@@ -1,0 +1,134 @@
+/* ==========================================================================
+   RUTA DE RECUPERACIÓN - MOBILE & ANDROID RESPONSIVE STYLES
+   ========================================================================== */
+
+/* Bottom Navigation Bar for Mobile */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 150;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--border-card);
+  padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)) 12px;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.bottom-nav-item {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--trans-fast);
+  position: relative;
+}
+
+.bottom-nav-item .nav-icon {
+  font-size: 19px;
+}
+
+.bottom-nav-item.active {
+  color: var(--brand-blue-light);
+}
+
+.bottom-nav-item.active .nav-icon {
+  transform: scale(1.12);
+}
+
+/* Floating SOS button on mobile */
+.mobile-sos-fab {
+  display: none;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 860px) {
+  .view-switcher-container {
+    display: none; /* Replaced by bottom navigation / drawer on small screens */
+  }
+
+  .main-nav {
+    display: none; /* Switch to bottom tab navigation on mobile */
+  }
+
+  .bottom-nav {
+    display: flex;
+  }
+
+  .app-content {
+    padding: 16px 14px 90px 14px;
+  }
+
+  .counter-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .counter-val {
+    font-size: 26px;
+  }
+
+  .recovery-hero {
+    padding: 18px 16px;
+  }
+
+  .pacer-circle-wrap {
+    width: 180px;
+    height: 180px;
+  }
+
+  .pacer-bubble {
+    width: 115px;
+    height: 115px;
+  }
+
+  .modal-dialog {
+    max-width: 100%;
+    margin: 10px;
+    max-height: 94vh;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 8px 12px;
+  }
+
+  .brand-info h1 {
+    font-size: 14.5px;
+  }
+
+  .sync-status-badge span.sync-text {
+    display: none;
+  }
+
+  .btn-sos {
+    padding: 6px 12px;
+    font-size: 11.5px;
+  }
+}

@@ -1,0 +1,360 @@
+/* ==========================================================================
+   RUTA DE RECUPERACIÓN - MAIN DESIGN SYSTEM & THEME TOKENS
+   Clinical & Therapeutic Modern Dark/Light Theme
+   ========================================================================== */
+
+:root {
+  /* Color Palette - Clinical & Recovery Focused */
+  --primary-navy: #0f172a;
+  --secondary-navy: #1e293b;
+  --surface-navy: #162032;
+  --border-navy: #334155;
+  
+  --brand-blue: #0284c7;
+  --brand-blue-light: #38bdf8;
+  --brand-blue-bg: rgba(2, 132, 199, 0.12);
+  
+  --recovery-emerald: #10b981;
+  --recovery-emerald-light: #34d399;
+  --recovery-emerald-bg: rgba(16, 185, 129, 0.12);
+  
+  --warning-amber: #f59e0b;
+  --warning-amber-light: #fbbf24;
+  --warning-amber-bg: rgba(245, 158, 11, 0.12);
+  
+  --danger-crimson: #ef4444;
+  --danger-crimson-light: #f87171;
+  --danger-crimson-bg: rgba(239, 68, 68, 0.14);
+
+  --purple-accent: #8b5cf6;
+  --purple-accent-bg: rgba(139, 92, 246, 0.12);
+  
+  /* Text Colors */
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --text-inverse: #0f172a;
+
+  /* Surfaces & Glassmorphism */
+  --bg-app: #090d16;
+  --bg-card: rgba(30, 41, 59, 0.75);
+  --bg-card-hover: rgba(51, 65, 85, 0.85);
+  --bg-card-solid: #1e293b;
+  --border-card: rgba(255, 255, 255, 0.08);
+  --border-card-active: rgba(56, 189, 248, 0.4);
+  --glass-blur: blur(16px);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-glow-blue: 0 0 20px rgba(56, 189, 248, 0.25);
+  --shadow-glow-emerald: 0 0 20px rgba(16, 185, 129, 0.25);
+  --shadow-glow-crimson: 0 0 20px rgba(239, 68, 68, 0.35);
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacings & Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --trans-fast: 0.15s ease;
+  --trans-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --trans-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light Theme overrides if toggled */
+body.light-theme {
+  --bg-app: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-hover: #ffffff;
+  --bg-card-solid: #ffffff;
+  --border-card: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #64748b;
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.08);
+}
+
+/* Global Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Base Layout Structure */
+#app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* App Header */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--border-card);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.brand-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #0284c7 0%, #10b981 100%);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 20px;
+  box-shadow: var(--shadow-glow-blue);
+}
+
+.brand-info h1 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.brand-info span {
+  font-size: 11px;
+  color: var(--brand-blue-light);
+  font-weight: 500;
+}
+
+/* Header Middle - View Switcher */
+.view-switcher-container {
+  display: flex;
+  background: var(--surface-navy);
+  padding: 4px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-card);
+}
+
+.view-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--trans-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.view-btn:hover {
+  color: var(--text-main);
+}
+
+.view-btn.active {
+  background: linear-gradient(135deg, var(--brand-blue) 0%, #0369a1 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+}
+
+/* Header Actions (Google Sync & SOS Button) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sync-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-navy);
+  border: 1px solid var(--border-card);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--trans-fast);
+}
+
+.sync-status-badge:hover {
+  border-color: var(--brand-blue);
+  color: var(--text-main);
+}
+
+.sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+}
+
+.sync-dot.synced {
+  background: var(--recovery-emerald);
+  box-shadow: 0 0 8px var(--recovery-emerald);
+}
+
+.sync-dot.syncing {
+  background: var(--warning-amber);
+  animation: pulse 1s infinite;
+}
+
+.sync-dot.error {
+  background: var(--danger-crimson);
+}
+
+/* SOS Panic Button */
+.btn-sos {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  color: #ffffff;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--shadow-glow-crimson);
+  transition: var(--trans-fast);
+  animation: subtlePulse 2.5s infinite;
+}
+
+.btn-sos:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+}
+
+/* Main Navigation Bar (Desktop & Tablet) */
+.main-nav {
+  background: var(--surface-navy);
+  border-bottom: 1px solid var(--border-card);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.main-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-tab {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 13px 18px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: var(--trans-fast);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.nav-tab:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.nav-tab.active {
+  color: var(--brand-blue-light);
+  border-bottom-color: var(--brand-blue-light);
+  background: rgba(2, 132, 199, 0.06);
+}
+
+.nav-tab .tab-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.nav-tab.active .tab-badge {
+  background: var(--brand-blue);
+  color: #ffffff;
+}
+
+/* Main Content Area */
+.app-content {
+  flex: 1;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 20px 80px 20px;
+}
+
+/* Tab Views Container */
+.tab-view {
+  display: none;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+.tab-view.active {
+  display: block;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes subtlePulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 22px rgba(239, 68, 68, 0.7); }
+}

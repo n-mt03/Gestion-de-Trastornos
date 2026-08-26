@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Ruta de Recuperación | Trastorno por Juego (DSM-5-TR)</title>
+
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="assets/icons/icon-192.png" />
+
+  <!-- Google Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Google Identity Services (GIS) OAuth 2.0 SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/mobile.css" />
+</head>
+<body>
+  <div id="app-container">
+    
+    <!-- TOP HEADER -->
+    <header class="app-header">
+      <div class="header-brand" onclick="window.appRouter.switchTab('dashboard')">
+        <div class="brand-icon">🛡️</div>
+        <div class="brand-info">
+          <h1>Ruta de Recuperación</h1>
+          <span>Trastorno por Juego (DSM-5-TR F63.0)</span>
+        </div>
+      </div>
+
+      <!-- VIEW SWITCHER (Paciente / Familiar / Especialista) -->
+      <div class="view-switcher-container">
+        <button class="view-btn active" data-view="patient">👤 Paciente</button>
+        <button class="view-btn" data-view="family">👥 Familia</button>
+        <button class="view-btn" data-view="specialist">🩺 Especialista</button>
+      </div>
+
+      <!-- HEADER ACTIONS: GOOGLE SYNC & SOS PANIC -->
+      <div class="header-actions">
+        <div class="sync-status-badge" id="sync-badge" onclick="window.appRouter.openGoogleSetupModal()" title="Estado de Sincronización en la Nube">
+          <div class="sync-dot" id="sync-dot"></div>
+          <span class="sync-text" id="sync-status-text">Modo Local (Google)</span>
+        </div>
+
+        <button class="btn btn-outline btn-sm" onclick="window.appRouter.switchTab('help')" title="Centro de Ayuda y Guía de la App" style="padding:6px 10px;">
+          ❓ Ayuda
+        </button>
+
+        <button class="btn-sos" onclick="window.sosModule.openSosModal()" title="Acceso Rápido de Emergencia">
+          🚨 <span>SOS</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- DESKTOP / TABLET NAVIGATION BAR -->
+    <nav class="main-nav">
+      <button class="nav-tab active" data-tab="dashboard">
+        <span>📊</span> Tablero de Recuperación
+      </button>
+      <button class="nav-tab" data-tab="family">
+        <span>👥</span> Roles & Tareas Familiares
+      </button>
+      <button class="nav-tab" data-tab="debts">
+        <span>💳</span> Registro de Deudas & Acuerdos
+      </button>
+      <button class="nav-tab" data-tab="exercises">
+        <span>🧘</span> Ejercicios Terapéuticos
+      </button>
+      <button class="nav-tab" data-tab="psychoeducation">
+        <span>📖</span> Psicoeducación & DSM-5
+      </button>
+      <button class="nav-tab" data-tab="specialist">
+        <span>🩺</span> Informe Clínico
+      </button>
+      <button class="nav-tab" data-tab="google">
+        <span>☁️</span> Google Workspace
+      </button>
+      <button class="nav-tab" data-tab="help">
+        <span>❓</span> Centro de Ayuda
+      </button>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-content">
+      
+      <!-- ==========================================
+           TAB 1: DASHBOARD & PATIENT PROGRESS
+           ========================================== -->
+      <section class="tab-view active" id="tab-view-dashboard">
+        
+        <!-- HERO RECOVERY CLOCK -->
+        <div class="recovery-hero">
+          <div class="hero-header">
+            <div class="patient-pill">
+              <div class="patient-avatar" id="hero-patient-avatar">R</div>
+              <div class="patient-meta">
+                <h2 id="hero-patient-name">Roberto Gómez</h2>
+                <p id="hero-patient-status">En Fase 2 (Intervención TCC) • Contacto: Laura Gómez</p>
+              </div>
+            </div>
+            <button class="btn btn-success btn-sm" onclick="window.patientModule.openCheckinModal()">
+              ✍️ Check-in de Craving Diario
+            </button>
+          </div>
+
+          <!-- TIME COUNTER -->
+          <div class="counter-grid">
+            <div class="counter-unit">
+              <div class="counter-val" id="count-days">0</div>
+              <div class="counter-label">Días Limpios</div>
+            </div>
+            <div class="counter-unit">
+              <div class="counter-val" id="count-hours">00</div>
+              <div class="counter-label">Horas</div>
+            </div>
+            <div class="counter-unit">
+              <div class="counter-val" id="count-minutes">00</div>
+              <div class="counter-label">Minutos</div>
+            </div>
+            <div class="counter-unit">
+              <div class="counter-val" id="count-seconds">00</div>
+              <div class="counter-label">Segundos</div>
+            </div>
+          </div>
+
+          <!-- METRICS STRIP -->
+          <div class="metrics-strip">
+            <div class="metric-strip-item">
+              <div class="metric-strip-icon">💰</div>
+              <div>
+                <div class="metric-strip-val" id="metric-money-saved">$0</div>
+                <div class="metric-strip-label">Dinero Preservado Est.</div>
+              </div>
+            </div>
+            <div class="metric-strip-item">
+              <div class="metric-strip-icon">⏳</div>
+              <div>
+                <div class="metric-strip-val" id="metric-hours-saved">0 hrs</div>
+                <div class="metric-strip-label">Horas Ganadas para la Vida</div>
+              </div>
+            </div>
+            <div class="metric-strip-item">
+              <div class="metric-strip-icon">🛡️</div>
+              <div>
+                <div class="metric-strip-val">100% Blindado</div>
+                <div class="metric-strip-label">Protección Financiera</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TWO COLUMN LAYOUT: CRAVING CHART & QUICK ACTIONS -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:20px;">
+          
+          <!-- CRAVING CHART CARD -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon blue">📈</div>
+                <div>
+                  <div class="card-title">Evolución del Craving (0-10)</div>
+                  <div class="card-subtitle">Intensidad del deseo de jugar a lo largo del tiempo</div>
+                </div>
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="window.patientModule.openCheckinModal()">+ Registrar</button>
+            </div>
+            <div class="chart-container" id="craving-chart-container"></div>
+          </div>
+
+          <!-- QUICK CRISIS & RELAPSE PREVENTION CARD -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon crimson">⚡</div>
+                <div>
+                  <div class="card-title">Contención & Acción Inmediata</div>
+                  <div class="card-subtitle">Herramientas en caso de impulso o malestar</div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <button class="btn btn-primary" style="justify-content:flex-start;" onclick="window.exercisesModule.startUrgeSurfing()">
+                🌊 Surfear el Impulso (Urge Surfing - 8 min)
+              </button>
+              <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="window.appRouter.switchTab('exercises')">
+                📝 Registro Cognitivo ABC de Distorsiones
+              </button>
+              <button class="btn btn-danger" style="justify-content:flex-start;" onclick="window.sosModule.openSosModal()">
+                🚨 Llamar a mi Acompañante de Guardia
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MILESTONE BADGES -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon emerald">🏆</div>
+              <div>
+                <div class="card-title">Hitos e Insignias de Recuperación</div>
+                <div class="card-subtitle">Logros de desensibilización y consolidación del tratamiento</div>
+              </div>
+            </div>
+          </div>
+          <div class="badges-container" id="milestones-grid"></div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 2: SYSTEMIC FAMILY & ROLES
+           ========================================== -->
+      <section class="tab-view" id="tab-view-family">
+        
+        <div class="alert-box info">
+          <span>ℹ️</span>
+          <div>
+            <strong>Intervención Sistémico-Familiar (DSM-5-TR / Guía Clínica)</strong>
+            La red familiar actúa como un equipo de coterapeutas coordinados para erradicar la co-dependencia y blindar al paciente sin caer en reproches ni sospechas continuas.
+          </div>
+        </div>
+
+        <!-- 5 FAMILY ROLES MATRIX -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon blue">👥</div>
+              <div>
+                <div class="card-title">Matriz de 5 Roles Familiares Asignados</div>
+                <div class="card-subtitle">Responsabilidades distribuidas para la protección y el acompañamiento</div>
+              </div>
+            </div>
+          </div>
+          <div class="family-roles-grid" id="family-roles-container"></div>
+        </div>
+
+        <!-- TASKS & COMMITMENTS TABLE -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon emerald">📋</div>
+              <div>
+                <div class="card-title">Tablero de Compromisos y Tareas Familiares</div>
+                <div class="card-subtitle">Checklist auditable con verificación de cumplimiento</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="window.familyModule.openAddTaskModal()">+ Nueva Tarea</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 40px;">Estado</th>
+                  <th>Compromiso / Tarea</th>
+                  <th>Rol Responsable</th>
+                  <th>Fecha Límite</th>
+                  <th style="width: 60px;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="family-tasks-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- DO'S AND DON'TS GUIDE -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:20px;">
+          <div class="card" style="border-left:4px solid var(--recovery-emerald);">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--recovery-emerald-light);">✅ Lo que la Familia SÍ debe hacer</div>
+            </div>
+            <ul style="font-size:13px;color:var(--text-main);padding-left:18px;line-height:1.6;">
+              <li>Establecer límites conductuales firmes, claros y serenos.</li>
+              <li>Supervisar el dinero con mutuo acuerdo y total transparencia.</li>
+              <li>Preguntar con calma y directamente por la presencia del impulso de jugar.</li>
+              <li>Acompañar a las sesiones de psicoterapia y psiquiatría.</li>
+              <li>Celebrar conductas activas de recuperación, honestidad y días limpios.</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-left:4px solid var(--danger-crimson);">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--danger-crimson-light);">🛑 Lo que la Familia NUNCA debe hacer (Anti-Bailout)</div>
+            </div>
+            <ul style="font-size:13px;color:var(--text-main);padding-left:18px;line-height:1.6;">
+              <li><strong>NUNCA pagar las deudas del paciente en secreto</strong> (evitar el rescate encubierto).</li>
+              <li>No entregar dinero en efectivo no presupuestado ante supuestas "emergencias".</li>
+              <li>No sermonear, insultar ni discutir durante una crisis aguda de craving.</li>
+              <li>No pretender sustituir el tratamiento clínico por vigilancia policíaca constante.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 3: DEBT REGISTRY & FINANCIAL AUDIT
+           ========================================== -->
+      <section class="tab-view" id="tab-view-debts">
+        
+        <!-- FINANCIAL STATS & DONUT PROGRESS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon amber">💳</div>
+              <div>
+                <div class="card-title">Balance Maestro de Pasivos y Amortizaciones</div>
+                <div class="card-subtitle">Saneamiento financiero estructurado sin refinanciaciones impulsivas</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="window.debtsModule.openNewDebtModal()">+ Registrar Nueva Deuda</button>
+          </div>
+
+          <div id="debt-progress-container" style="margin-bottom:16px;"></div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:12px;border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;">
+            <div>
+              <div style="font-size:11px;color:var(--text-dim);font-weight:700;">TOTAL ORIGINAL TOMADO</div>
+              <div style="font-size:18px;font-weight:800;color:#ffffff;" id="stat-total-borrowed">$0</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text-dim);font-weight:700;">SALDO ADEUDADO A LA FECHA</div>
+              <div style="font-size:20px;font-weight:800;color:var(--danger-crimson-light);" id="stat-total-owed">$0</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text-dim);font-weight:700;">TOTAL AMORTIZADO</div>
+              <div style="font-size:18px;font-weight:800;color:var(--recovery-emerald-light);" id="stat-total-paid">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUPERVISED BUDGET CARD -->
+        <div class="card" style="background:linear-gradient(135deg, rgba(2, 132, 199, 0.1) 0%, var(--surface-navy) 100%);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--brand-blue-light);">💵 Presupuesto Semanal Supervisado en Efectivo</div>
+              <p style="font-size:12.5px;color:var(--text-muted);margin-top:2px;">
+                Cupo tasado exclusivamente para gastos diarios esenciales (comida básica, transporte). Administrado por el Responsable Financiero.
+              </p>
+            </div>
+            <div style="font-size:22px;font-weight:800;color:#ffffff;font-family:var(--font-mono);">$120 / semana</div>
+          </div>
+        </div>
+
+        <!-- DEBTS LIST WITH HIGHLIGHTED AGREEMENTS -->
+        <div id="debts-container"></div>
+      </section>
+
+      <!-- ==========================================
+           TAB 4: THERAPEUTIC EXERCISES (WITH BRIEF DESCRIPTIONS)
+           ========================================== -->
+      <section class="tab-view" id="tab-view-exercises">
+        
+        <div class="alert-box info" style="margin-bottom:20px;">
+          <span>🧘</span>
+          <div>
+            <strong>Catálogo de Ejercicios Clínicos Basados en Evidencia (TCC & Mindfulness)</strong>
+            Estas técnicas están diseñadas para desactivar el impulso urgente de jugar, desarticular distorsiones de azar y modular el sistema nervioso simpático en tiempo real.
+          </div>
+        </div>
+
+        <!-- EXERCISE 1: URGE SURFING -->
+        <div class="card" id="urge-surfing-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon blue">🌊</div>
+              <div>
+                <div class="card-title">1. Urge Surfing (Surfear la Ola del Impulso de Jugar)</div>
+                <div class="card-subtitle">Mindfulness somático &bull; Duración: 8 a 10 minutos</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DESCRIPCIÓN BREVE DEL EJERCICIO 1 -->
+          <div style="background:rgba(2, 132, 199, 0.08);border-left:4px solid var(--brand-blue-light);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-size:13px;line-height:1.5;">
+            <b style="color:var(--brand-blue-light);">¿Qué es y cómo funciona?</b> Técnica de Mindfulness que concibe el impulso de apostar como una ola del mar: nace, alcanza un pico máximo de tensión corporal (de 3 a 7 minutos) y luego se extingue de forma natural si no se ejecuta la apuesta.<br/>
+            <b style="color:#ffffff;">Objetivo:</b> Aprender a tolerar el malestar sin ceder al juego, utilizando respiración diafragmática (4s inhalación / 6s exhalación).<br/>
+            <b style="color:var(--warning-amber-light);">Cuándo usarlo:</b> En momentos de deseo intenso (*craving*), tras recibir dinero, o ante impulsos de fuga.
+          </div>
+
+          <div class="pacer-container">
+            <div class="pacer-circle-wrap">
+              <div class="pacer-outer-ring"></div>
+              <div class="pacer-bubble" id="pacer-bubble">
+                <div class="pacer-phase-text" id="pacer-phase-text">PREPARADO</div>
+                <div class="pacer-timer-text" id="pacer-phase-timer">4s</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+              <span style="font-size:13px;color:var(--text-muted);">Tiempo Total de Sesión:</span>
+              <span style="font-size:18px;font-weight:800;color:#ffffff;font-family:var(--font-mono);" id="pacer-total-timer">08:00</span>
+            </div>
+
+            <div style="display:flex;gap:10px;">
+              <button class="btn btn-primary btn-lg" id="pacer-toggle-btn" onclick="window.exercisesModule.togglePacer()">
+                ▶ Iniciar Surfear el Impulso (8 min)
+              </button>
+              <button class="btn btn-outline" onclick="window.exercisesModule.resetPacer()">Reiniciar</button>
+            </div>
+          </div>
+
+          <!-- SOMATIC SCANNER -->
+          <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;margin-top:16px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:6px;">
+              🧘 Escáner Somático: ¿Dónde localizas la tensión en tu cuerpo? (Toca para marcar):
+            </div>
+            <div class="somatic-scan-grid">
+              <div class="somatic-item"><span>🫁</span> Opresión en pecho</div>
+              <div class="somatic-item"><span>💓</span> Taquicardia</div>
+              <div class="somatic-item"><span>🤢</span> Nudo en estómago</div>
+              <div class="somatic-item"><span>👐</span> Manos inquietas</div>
+              <div class="somatic-item"><span>⚡</span> Agitación mental</div>
+              <div class="somatic-item"><span>😬</span> Mandíbula tensa</div>
+            </div>
+            <p style="font-size:12px;color:var(--text-dim);margin:0;">
+              <i>Recuerda: Inhala inflando el abdomen en 4 segundos y exhala lentamente en 6 segundos. La urgencia bajará por sí sola.</i>
+            </p>
+          </div>
+        </div>
+
+        <!-- EXERCISE 2: COGNITIVE ABC -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon purple">🧠</div>
+              <div>
+                <div class="card-title">2. Registro Cognitivo ABC de Distorsiones del Juego</div>
+                <div class="card-subtitle">Terapia Cognitivo-Conductual (TCC) &bull; Reestructuración del pensamiento</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DESCRIPCIÓN BREVE DEL EJERCICIO 2 -->
+          <div style="background:rgba(139, 92, 246, 0.08);border-left:4px solid var(--purple-accent);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-size:13px;line-height:1.5;">
+            <b style="color:var(--purple-accent);">¿Qué es y cómo funciona?</b> Herramienta estructurada de la TCC para atrapar y desarmar en tiempo real los pensamientos engañosos del jugador (ej. <i>"hoy recupero", "la máquina tiene que pagar"</i>).<br/>
+            <b style="color:#ffffff;">Objetivo:</b> Analizar el detonante (A), cuestionar la creencia irracional con datos objetivos de azar (B &rarr; C) y sustituirla por una conducta saludable (D).<br/>
+            <b style="color:var(--warning-amber-light);">Cuándo usarlo:</b> Ante cualquier pensamiento de "rescate rápido", justificación para apostar o autoengaño.
+          </div>
+
+          <!-- TEMPLATES SELECTOR -->
+          <div style="margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Cargar Plantilla de Distorsión Típica:</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" onclick="window.exercisesModule.loadAbcTemplate('falacia')">🎲 Falacia del Jugador</button>
+              <button class="btn btn-outline btn-sm" onclick="window.exercisesModule.loadAbcTemplate('control')">🕹️ Ilusión de Control</button>
+              <button class="btn btn-outline btn-sm" onclick="window.exercisesModule.loadAbcTemplate('chasing')">💸 Caza de Pérdidas (Chasing)</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">A - Antecedente / Situación Gatillo: <span class="required">*</span></label>
+            <textarea class="form-control" id="abc-trigger-input" placeholder="¿Qué ocurrió? (Ej: Cobré el sueldo, vi un anuncio deportivo, estuve solo por la noche)"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">B - Pensamiento Irracional Automático: <span class="required">*</span></label>
+            <textarea class="form-control" id="abc-thought-input" placeholder="¿Qué pensaste? (Ej: 'Si apuesto $50 ahora recupero todo lo perdido y pago la tarjeta')"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">C - Debate Racional Basado en la Realidad: <span class="required">*</span></label>
+            <textarea class="form-control" id="abc-debate-input" placeholder="¿Cuál es la verdad objetiva? (Ej: 'El juego nunca soluciona deudas, las probabilidades matemáticas siempre favorecen a la casa')"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">D - Conducta Alternativa Saludable: <span class="required">*</span></label>
+            <input type="text" class="form-control" id="abc-action-input" placeholder="¿Qué acción constructiva realizaste en su lugar? (Ej: Salir a caminar, llamar a mi hermano)" />
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;margin-bottom:18px;">
+            <button class="btn btn-success" onclick="window.exercisesModule.saveAbcRecord()">💾 Guardar Reestructuración ABC</button>
+          </div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:8px;">Historial de Registros ABC Guardados:</div>
+          <div id="abc-records-list"></div>
+        </div>
+
+        <!-- EXERCISE 3: 5-4-3-2-1 GROUNDING -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon emerald">👁️</div>
+              <div>
+                <div class="card-title">3. Técnica de Anclaje Sensorial 5-4-3-2-1</div>
+                <div class="card-subtitle">Regulación psicosomática &bull; Desconexión del impulso y reconexión presente</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DESCRIPCIÓN BREVE DEL EJERCICIO 3 -->
+          <div style="background:rgba(16, 185, 129, 0.08);border-left:4px solid var(--recovery-emerald);padding:10px 14px;border-radius:4px;margin-bottom:16px;font-size:13px;line-height:1.5;">
+            <b style="color:var(--recovery-emerald-light);">¿Qué es y cómo funciona?</b> Técnica de focalización sensorial que obliga al cerebro a reconectarse con los 5 sentidos del entorno físico, desactivando la hiperactivación del sistema simpático.<br/>
+            <b style="color:#ffffff;">Objetivo:</b> Frenar la disociación psicológica y los bucles de angustia o rumiación antes de que desemboquen en juego compulsivo.<br/>
+            <b style="color:var(--warning-amber-light);">Cuándo usarlo:</b> En momentos de ansiedad repentina, pensamientos intrusivos o inquietud motriz.
+          </div>
+
+          <div class="grounding-step-card">
+            <div class="grounding-header">
+              <div class="grounding-number">5</div>
+              <div style="font-weight:700;color:#ffffff;">5 Cosas que puedas VER a tu alrededor</div>
+            </div>
+            <input type="text" class="form-control" placeholder="Ej: La lámpara, una planta, el reloj de pared, el cuadro, mis zapatos..." />
+          </div>
+
+          <div class="grounding-step-card">
+            <div class="grounding-header">
+              <div class="grounding-number">4</div>
+              <div style="font-weight:700;color:#ffffff;">4 Cosas que puedas TOCAR físicamente</div>
+            </div>
+            <input type="text" class="form-control" placeholder="Ej: La textura de mi pantalón, la mesa de madera, el agua fría, el anillo..." />
+          </div>
+
+          <div class="grounding-step-card">
+            <div class="grounding-header">
+              <div class="grounding-number">3</div>
+              <div style="font-weight:700;color:#ffffff;">3 Sonidos que puedas ESCUCHAR en el entorno</div>
+            </div>
+            <input type="text" class="form-control" placeholder="Ej: El motor de un coche lejano, el viento en la ventana, mi respiración..." />
+          </div>
+
+          <div class="grounding-step-card">
+            <div class="grounding-header">
+              <div class="grounding-number">2</div>
+              <div style="font-weight:700;color:#ffffff;">2 Olores que puedas PERCIBIR</div>
+            </div>
+            <input type="text" class="form-control" placeholder="Ej: Café recién hecho, el perfume en mi muñeca, aire fresco..." />
+          </div>
+
+          <div class="grounding-step-card">
+            <div class="grounding-header">
+              <div class="grounding-number">1</div>
+              <div style="font-weight:700;color:#ffffff;">1 Sensación física interna AGRADABLE</div>
+            </div>
+            <input type="text" class="form-control" placeholder="Ej: El calor en mis palmas, la relajación en mis hombros, los pies firmes en el suelo..." />
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn btn-primary" onclick="window.exercisesModule.saveGroundingSession()">✨ Finalizar Sesión de Anclaje</button>
+          </div>
+        </div>
+
+        <!-- EXERCISE 4: EXPOSICIÓN GRADUAL EPR & HIGIENE DEL SUEÑO -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:20px;">
+          
+          <div class="card" style="border-left:4px solid var(--brand-blue);">
+            <div class="card-header">
+              <div class="card-title">4. Exposición con Prevención de Respuesta (EPR)</div>
+            </div>
+            <div style="font-size:12.5px;color:var(--text-muted);line-height:1.5;">
+              <b style="color:var(--brand-blue-light);">¿Qué es?</b> Técnica conductual guiada por el coterapeuta familiar para transitar cerca de estímulos de juego sin apostar, extinguiendo la reactividad cerebral condicionada.<br/>
+              <b style="color:#ffffff;">Cuándo usarlo:</b> En Fase 2 y 3 del tratamiento clínico bajo supervisión del acompañante de riesgo.
+            </div>
+          </div>
+
+          <div class="card" style="border-left:4px solid var(--purple-accent);">
+            <div class="card-header">
+              <div class="card-title">5. Higiene del Sueño y Desconexión Digital</div>
+            </div>
+            <div style="font-size:12.5px;color:var(--text-muted);line-height:1.5;">
+              <b style="color:var(--purple-accent);">¿Qué es?</b> Protocolo de desactivación de pantallas 90 minutos antes de dormir para restaurar los niveles de melatonina y reducir la impulsividad diurna del lóbulo prefrontal.<br/>
+              <b style="color:#ffffff;">Cuándo usarlo:</b> Todas las noches antes de las 10:30 PM.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 5: PSYCHOEDUCATION & DSM-5-TR
+           ========================================== -->
+      <section class="tab-view" id="tab-view-psychoeducation">
+        
+        <!-- NEUROBIOLOGY -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon blue">🧬</div>
+              <div>
+                <div class="card-title">Bases Neurobiológicas de la Adicción al Juego</div>
+                <div class="card-subtitle">DSM-5-TR (F63.0) y CIE-11 (6C50)</div>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:13.5px;color:var(--text-main);line-height:1.6;">
+            La ludopatía es una <b>adicción conductual</b> donde el circuito mesolímbico de recompensa cerebral experimenta una hipersensibilización a los estímulos del juego y una desensibilización a las recompensas naturales de la vida (familia, hobbies, trabajo).
+          </p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px;margin-top:12px;">
+            <div style="background:var(--surface-navy);padding:12px;border-radius:var(--radius-md);border:1px solid var(--border-card);">
+              <b style="color:var(--brand-blue-light);">Refuerzo de Razón Variable</b>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Las tragaperras y apuestas generan impredecibilidad química. Los "casi aciertos" liberan descargas masivas de dopamina idénticas a ganar.</p>
+            </div>
+            <div style="background:var(--surface-navy);padding:12px;border-radius:var(--radius-md);border:1px solid var(--border-card);">
+              <b style="color:var(--warning-amber-light);">Efecto de Desmaterialización</b>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">En las plataformas digitales, el dinero se transforma en fichas o saldos virtuales, reduciendo el freno psicológico del gasto.</p>
+            </div>
+            <div style="background:var(--surface-navy);padding:12px;border-radius:var(--radius-md);border:1px solid var(--border-card);">
+              <b style="color:var(--danger-crimson-light);">Función Disociativa</b>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">El juego opera como un anestésico emocional para evadirse de la soledad, el estrés económico o las discusiones familiares.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- DSM-5 9 CRITERIA EVALUATOR -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon emerald">📋</div>
+              <div>
+                <div class="card-title">Criterios Diagnósticos Oficiales DSM-5-TR</div>
+                <div class="card-subtitle">Autoevaluación clínica (El diagnóstico formal requiere 4 o más criterios en 12 meses)</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;">
+              <input type="checkbox" name="dsm-criterion" style="width:18px;height:18px;margin-top:2px;accent-color:var(--brand-blue);" />
+              <div><b>1. Tolerancia:</b> Necesidad de apostar cantidades crecientes de dinero para lograr la excitación o alivio deseado.</div>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;">
+              <input type="checkbox" name="dsm-criterion" style="width:18px;height:18px;margin-top:2px;accent-color:var(--brand-blue);" />
+              <div><b>2. Abstinencia:</b> Irritabilidad, inquietud o ansiedad severa cuando se intenta reducir o abandonar el juego.</div>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;">
+              <input type="checkbox" name="dsm-criterion" style="width:18px;height:18px;margin-top:2px;accent-color:var(--brand-blue);" />
+              <div><b>3. Pérdida de Control:</b> Esfuerzos reiterados e infructuosos por frenar, controlar o detener la conducta de apuesta.</div>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;">
+              <input type="checkbox" name="dsm-criterion" style="width:18px;height:18px;margin-top:2px;accent-color:var(--brand-blue);" />
+              <div><b>4. Preocupación Cognitiva:</b> Pensamiento obsesivo centrado en el juego (planificar apuestas, buscar fondos).</div>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;">
+              <input type="checkbox" name="dsm-criterion" style="width:18px;height:18px;margin-top:2px;accent-color:var(--brand-blue);" />
+              <div><b>5. Escape Emocional:</b> Apostar con frecuencia cuando se experimenta malestar (culpa, ansiedad, tristeza, soledad).</div>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;">
+              <input type="checkbox" name="dsm-criterion" style="width:18px;height:18px;margin-top:2px;accent-color:var(--brand-blue);" />
+              <div><b>6. Caza de Pérdidas (Chasing):</b> Volver al juego tras perder dinero con la firme convicción de recuperar lo perdido.</div>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;">
+              <input type="checkbox" name="dsm-criterion" style="width:18px;height:18px;margin-top:2px;accent-color:var(--brand-blue);" />
+              <div><b>7. Ocultamiento y Mentiras:</b> Engaño sistemático a familiares o terapeutas sobre el dinero o tiempo dedicado al juego.</div>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;">
+              <input type="checkbox" name="dsm-criterion" style="width:18px;height:18px;margin-top:2px;accent-color:var(--brand-blue);" />
+              <div><b>8. Ruptura Relacional / Laboral:</b> Pérdida o peligro grave de relaciones significativas, empleo o estudios por apostar.</div>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;">
+              <input type="checkbox" name="dsm-criterion" style="width:18px;height:18px;margin-top:2px;accent-color:var(--brand-blue);" />
+              <div><b>9. Rescate Financiero (Bailout):</b> Dependencia económica de terceros para solventar situaciones de quiebra financiera.</div>
+            </label>
+          </div>
+
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary" onclick="window.psychoeducationModule.evaluateSogs()">📊 Evaluar Criterios Marcados</button>
+          </div>
+
+          <div id="dsm-result-box" class="alert-box info" style="display:none;margin-top:14px;">
+            <span id="dsm-result-text"></span>
+          </div>
+        </div>
+
+        <!-- 4 CLINICAL PHASES -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon purple">🗺️</div>
+              <div>
+                <div class="card-title">Ruta Clínica Escalonada en 4 Fases</div>
+                <div class="card-subtitle">Proceso de rehabilitación y prevención sostenida</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:14px;">
+            <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-left:4px solid var(--danger-crimson);border-radius:var(--radius-md);padding:14px;">
+              <div style="font-weight:700;color:#ffffff;font-size:14px;">Fase 1: Protección (Sem 1-4)</div>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Autoexclusión formal (RGIAJ/locales), software bloqueador, traspaso de tarjetas y control del libro de deudas.</p>
+            </div>
+            <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-left:4px solid var(--brand-blue);border-radius:var(--radius-md);padding:14px;">
+              <div style="font-weight:700;color:#ffffff;font-size:14px;">Fase 2: Intervención TCC (Mes 2-4)</div>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Control de estímulos, rutas peatonales seguras, desarticulación de la falacia del jugador y abordaje psiquiátrico.</p>
+            </div>
+            <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-left:4px solid var(--warning-amber);border-radius:var(--radius-md);padding:14px;">
+              <div style="font-weight:700;color:#ffffff;font-size:14px;">Fase 3: Rehabilitación (Mes 4-8)</div>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Reactivación de ocio saludable no monetario, devolución paulatina de autonomía supervisada y reparación vincular.</p>
+            </div>
+            <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-left:4px solid var(--recovery-emerald);border-radius:var(--radius-md);padding:14px;">
+              <div style="font-weight:700;color:#ffffff;font-size:14px;">Fase 4: Mantenimiento (Mes 8+)</div>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Vigilancia de detonantes (dinero, soledad, estrés), protocolo de contención ante deslices y proyecto vital.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 6: SPECIALIST CLINICAL REPORT
+           ========================================== -->
+      <section class="tab-view" id="tab-view-specialist">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon blue">🩺</div>
+              <div>
+                <div class="card-title">Panel del Terapeuta y Reporte Clínico Formal</div>
+                <div class="card-subtitle">Exportación para psiquiatría, psicoterapia y archivo clínico</div>
+              </div>
+            </div>
+          </div>
+
+          <p style="font-size:13.5px;color:var(--text-main);margin-bottom:16px;">
+            Genera documentos formalizados con los datos de adherencia, evolución del craving, inventario de deudas y tareas familiares para entregar al psicólogo o psiquiatra tratante:
+          </p>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+            <button class="btn btn-primary" onclick="window.exportUtility.exportClinicalReport()">
+              🖨️ Imprimir / Exportar Informe en PDF
+            </button>
+            <button class="btn btn-secondary" onclick="window.googleDocsSync.generateClinicalDoc()">
+              📄 Crear Informe en Google Docs (Drive)
+            </button>
+            <button class="btn btn-outline" onclick="window.exportUtility.exportBackupJSON()">
+              💾 Descargar Copia JSON
+            </button>
+          </div>
+
+          <div class="alert-box success">
+            <span>🛡️</span>
+            <div>
+              <strong>Cumplimiento de Confidencialidad y Seguridad Médica</strong>
+              Todos los datos permanecen en el dispositivo del usuario y se transmiten exclusivamente a su cuenta personal de Google sin servidores intermediarios no autorizados.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 7: GOOGLE WORKSPACE SYNC CENTER
+           ========================================== -->
+      <section class="tab-view" id="tab-view-google">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon blue">☁️</div>
+              <div>
+                <div class="card-title">Centro de Sincronización Google Workspace</div>
+                <div class="card-subtitle">Conexión con Google Sheets, Google Docs, Calendar y Drive</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:16px;margin-bottom:20px;">
+            
+            <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-radius:var(--radius-md);padding:16px;">
+              <div style="font-size:22px;margin-bottom:6px;">📊</div>
+              <div style="font-size:15px;font-weight:700;color:#ffffff;">Google Sheets</div>
+              <p style="font-size:12px;color:var(--text-muted);margin:6px 0 12px 0;">Base de datos en tiempo real con 6 pestañas estructuradas.</p>
+              <button class="btn btn-success btn-sm" onclick="window.googleAuth.triggerInitialSync()">Sincronizar Sheets</button>
+            </div>
+
+            <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-radius:var(--radius-md);padding:16px;">
+              <div style="font-size:22px;margin-bottom:6px;">📄</div>
+              <div style="font-size:15px;font-weight:700;color:#ffffff;">Google Docs</div>
+              <p style="font-size:12px;color:var(--text-muted);margin:6px 0 12px 0;">Genera el informe clínico de evolución en tu Drive.</p>
+              <button class="btn btn-primary btn-sm" onclick="window.googleDocsSync.generateClinicalDoc()">Generar Doc</button>
+            </div>
+
+            <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-radius:var(--radius-md);padding:16px;">
+              <div style="font-size:22px;margin-bottom:6px;">📅</div>
+              <div style="font-size:15px;font-weight:700;color:#ffffff;">Google Calendar</div>
+              <p style="font-size:12px;color:var(--text-muted);margin:6px 0 12px 0;">Citas terapéuticas, reuniones familiares de 15m y vencimientos.</p>
+              <button class="btn btn-secondary btn-sm" onclick="window.googleCalendarSync.syncAllCalendarEvents()">Sincronizar Agenda</button>
+            </div>
+
+            <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-radius:var(--radius-md);padding:16px;">
+              <div style="font-size:22px;margin-bottom:6px;">📁</div>
+              <div style="font-size:15px;font-weight:700;color:#ffffff;">Google Drive</div>
+              <p style="font-size:12px;color:var(--text-muted);margin:6px 0 12px 0;">Carpeta 'Ruta de Recuperación' para copias de seguridad.</p>
+              <button class="btn btn-outline btn-sm" onclick="window.googleDriveSync.backupStateToDrive()">Respaldar en Drive</button>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn btn-outline btn-sm" onclick="window.appRouter.openGoogleSetupModal()">⚙️ Configurar Cuenta / Client ID</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 8: CENTRO DE AYUDA & GUÍA INTEGRAL
+           ========================================== -->
+      <section class="tab-view" id="tab-view-help">
+        
+        <div class="card" style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0369a1 100%);">
+          <div style="font-size:20px;font-weight:800;color:#ffffff;margin-bottom:6px;">❓ Centro de Ayuda & Manual de Uso Módulo por Módulo</div>
+          <p style="font-size:13.5px;color:#cbd5e1;line-height:1.6;margin:0;">
+            Bienvenido al manual operativo de <b>Ruta de Recuperación</b>. Esta aplicación combina psiquiatría, Terapia Cognitivo-Conductual (TCC), intervención sistémico-familiar y saneamiento financiero para acompañar al paciente y su entorno hacia una recuperación sostenible.
+          </p>
+        </div>
+
+        <!-- MÓDULO POR MÓDULO -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          
+          <!-- MÓDULO 1 AYUDA -->
+          <div class="card" style="border-left:4px solid var(--recovery-emerald);">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--recovery-emerald-light);">📊 Módulo 1: Tablero de Recuperación & Check-in de Craving</div>
+            </div>
+            <div style="font-size:13px;color:var(--text-main);line-height:1.6;">
+              <p><b>¿Para qué sirve?</b> Es el centro de mando diario del paciente. Muestra los días, horas, minutos y segundos acumulados sin apostar, junto con la estimación de dinero preservado y horas recuperadas.</p>
+              <p><b>Cómo usarlo:</b></p>
+              <ul>
+                <li><b>Check-in Diario:</b> Haz clic en <i>"✍️ Check-in de Craving Diario"</i> por la mañana y por la noche. Ajusta el deslizador de 0 a 10 para registrar la intensidad del deseo de jugar, tu estado de ánimo, horas de sueño y detonantes activos.</li>
+                <li><b>Gráfica de Craving:</b> Muestra la tendencia temporal de tu deseo. Si notas una curva ascendente, activa anticipadamente tus estrategias de contención.</li>
+                <li><b>Insignias de Hitos:</b> Se desbloquean automáticamente conforme sumas días limpios (24h, 1 semana, 1 mes, 90 días, 1 año).</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- MÓDULO 2 AYUDA -->
+          <div class="card" style="border-left:4px solid var(--brand-blue);">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--brand-blue-light);">👥 Módulo 2: Roles Familiares & Tablero de Tareas</div>
+            </div>
+            <div style="font-size:13px;color:var(--text-main);line-height:1.6;">
+              <p><b>¿Para qué sirve?</b> Organiza a los seres queridos como una red de coterapeutas, asignando responsabilidades específicas para evitar la sobrecarga y la desconfianza.</p>
+              <p><b>Los 5 Roles Clave:</b></p>
+              <ol>
+                <li><b>Coordinador Familiar:</b> Interlocutor principal con el psicólogo/psiquiatra y convocante de la reunión breve de 15 min semanal.</li>
+                <li><b>Responsable Financiero:</b> Custodia tarjetas, supervisa el extracto y entrega el presupuesto semanal tasado.</li>
+                <li><b>Acompañante en Riesgo:</b> Acompaña en franjas horarias vulnerables (01:00-05:00 AM, cobros de sueldo, fines de semana).</li>
+                <li><b>Apoyo Emocional:</b> Brinda escucha activa sin juicio ni reproches del pasado.</li>
+                <li><b>Enlace Médico:</b> Supervisa la toma de medicación prescrita (ej. Naltrexona) y la calidad del sueño.</li>
+              </ol>
+              <div class="alert-box alert" style="margin-top:10px;">
+                <b>Regla de Oro Anti-Bailout:</b> La familia <b>NUNCA debe pagar deudas en secreto</b> ni entregar dinero en efectivo no presupuestado. El rescate encubierto reactiva el ciclo de la adicción.
+              </div>
+            </div>
+          </div>
+
+          <!-- MÓDULO 3 AYUDA -->
+          <div class="card" style="border-left:4px solid var(--warning-amber);">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--warning-amber-light);">💳 Módulo 3: Registro de Deudas, Acuerdos Pactados y Finanzas</div>
+            </div>
+            <div style="font-size:13px;color:var(--text-main);line-height:1.6;">
+              <p><b>¿Para qué sirve?</b> Detiene la espiral de endeudamiento y documenta con total transparencia las obligaciones económicas.</p>
+              <p><b>Funciones Clave:</b></p>
+              <ul>
+                <li><b>Registrar Deuda (+ Registrar Nueva Deuda):</b> Ingresa el nombre del acreedor, teléfono, monto original, saldo pendiente, tasa y fecha de vencimiento.</li>
+                <li><b>Sección Acuerdo Pactado:</b> Espacio donde se redactan los compromisos alcanzados con el prestamista o banco (congelación de intereses, quitas, plan de cuotas y persona financiera garante).</li>
+                <li><b>Registrar Abonos (💵 Registrar Abono):</b> Cada pago realizado descuenta el saldo automáticamente y actualiza la gráfica de progreso financiero.</li>
+                <li><b>Presupuesto Semanal Tasado:</b> Establece un cupo de efectivo fijo semanal ($120) para evitar disponer de dinero líquido susceptible de ser apostado.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- MÓDULO 4 AYUDA -->
+          <div class="card" style="border-left:4px solid var(--purple-accent);">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--purple-accent);">🧘 Módulo 4: Catálogo de Ejercicios Terapéuticos</div>
+            </div>
+            <div style="font-size:13px;color:var(--text-main);line-height:1.6;">
+              <p><b>¿Para qué sirve?</b> Proporciona intervenciones clínicas de autoaplicación inmediata en momentos de urgencia o malestar emocional.</p>
+              <p><b>Guía de Ejercicios:</b></p>
+              <ul>
+                <li><b>Urge Surfing (8 min):</b> Utiliza el pacer de respiración para inhalar en 4 segundos y exhalar en 6 segundos. Observa cómo la ola de tensión corporal rompe hacia la calma sin necesidad de apostar.</li>
+                <li><b>Registro Cognitivo ABC:</b> Rellena los 4 campos cuando sientas ganas de apostar para desarmar la *Falacia del Jugador* o la *Caza de Pérdidas*.</li>
+                <li><b>Anclaje Sensorial 5-4-3-2-1:</b> Nombra en voz alta o escribe 5 cosas vistas, 4 tocadas, 3 oídas, 2 olfateadas y 1 corporal agradable para frenar la ansiedad.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- MÓDULO 5 AYUDA -->
+          <div class="card" style="border-left:4px solid var(--brand-blue-light);">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--brand-blue-light);">📖 Módulo 5: Psicoeducación & Criterios DSM-5-TR</div>
+            </div>
+            <div style="font-size:13px;color:var(--text-main);line-height:1.6;">
+              <p><b>¿Para qué sirve?</b> Desmitifica la ludopatía como un problema de voluntad y explica las bases neurobiológicas del refuerzo intermitente y la trampa dopaminérgica.</p>
+              <p><b>Autoevaluación:</b> Marca los 9 criterios clínicos oficiales para conocer tu nivel de severidad diagnóstica y aprender en qué fase de las 4 etapas de recuperación te encuentras.</p>
+            </div>
+          </div>
+
+          <!-- MÓDULO 6 AYUDA -->
+          <div class="card" style="border-left:4px solid var(--danger-crimson);">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--danger-crimson-light);">🚨 Módulo 6: Protocolo SOS de Emergencia</div>
+            </div>
+            <div style="font-size:13px;color:var(--text-main);line-height:1.6;">
+              <p><b>¿Cuándo activarlo?</b> En cualquier momento en que sientas que estás a punto de realizar una apuesta o que no puedes controlar el impulso.</p>
+              <p><b>Acciones Inmediatas:</b></p>
+              <ol>
+                <li>Presiona el botón rojo <b>🚨 SOS</b> en la barra superior.</li>
+                <li>Llama o envía un WhatsApp instantáneo a tu <b>Acompañante de Guardia</b>.</li>
+                <li>Inicia la respiración guiada de Urge Surfing o comunícate con las líneas de ayuda 24/7 (900 200 225 / 988).</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- MÓDULO 7 AYUDA -->
+          <div class="card" style="border-left:4px solid #38bdf8;">
+            <div class="card-header">
+              <div class="card-title" style="color:#38bdf8;">☁️ Módulo 7: Conexión Google Workspace & Modo Offline</div>
+            </div>
+            <div style="font-size:13px;color:var(--text-main);line-height:1.6;">
+              <p><b>¿Cómo funciona la sincronización?</b></p>
+              <ul>
+                <li><b>Google Sheets:</b> Crea una hoja maestra <code>Ruta_de_Recuperacion_MasterDB</code> con 6 pestañas donde se respaldan tus check-ins, deudas y tareas.</li>
+                <li><b>Google Docs:</b> Genera informes clínicos estructurados en tu Drive con 1 clic para presentar al terapeuta o psiquiatra.</li>
+                <li><b>Google Calendar:</b> Sincroniza tus reuniones familiares, citas médicas y fechas de pago de deudas.</li>
+                <li><b>Modo Offline (Sin Internet):</b> Todos los datos se guardan en tu teléfono y se sincronizan con Google automáticamente al volver a tener conexión.</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="bottom-nav">
+      <button class="bottom-nav-item active" data-tab="dashboard">
+        <span class="nav-icon">📊</span>
+        <span>Progreso</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="family">
+        <span class="nav-icon">👥</span>
+        <span>Familia</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="debts">
+        <span class="nav-icon">💳</span>
+        <span>Deudas</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="exercises">
+        <span class="nav-icon">🧘</span>
+        <span>Ejercicios</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="help">
+        <span class="nav-icon">❓</span>
+        <span>Ayuda</span>
+      </button>
+    </nav>
+
+    <!-- TOAST NOTIFICATIONS CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- ==========================================
+         MODALS CONTAINER
+         ========================================== -->
+
+    <!-- MODAL 1: CHECK-IN DIARIO DE CRAVING -->
+    <div class="modal-overlay" id="checkin-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">✍️ Check-in Psicoafectivo y Deseo (Craving)</div>
+          <button class="modal-close" onclick="window.patientModule.closeCheckinModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <div class="slider-container">
+              <div class="slider-val-display">
+                <span class="form-label" style="margin:0;">Nivel de Impulso / Deseo de Jugar:</span>
+                <span class="slider-val-badge" id="checkin-craving-badge">2 / 10</span>
+              </div>
+              <input type="range" min="0" max="10" value="2" class="slider-input" id="checkin-craving-slider" />
+              <div class="slider-scale-labels">
+                <span>0 (Sin deseo)</span>
+                <span>5 (Moderado)</span>
+                <span>10 (Urgencia Máxima)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Estado de Ánimo:</label>
+              <select class="form-control" id="checkin-mood-select">
+                <option value="Tranquilo">Tranquilo / Estable</option>
+                <option value="Optimista">Optimista / Motivado</option>
+                <option value="Ansioso">Ansioso / Inquieto</option>
+                <option value="Estresado">Estresado / Agobiado</option>
+                <option value="Triste">Triste / Desanimado</option>
+                <option value="Cansado">Cansado / Agotado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Horas de Sueño Reparador:</label>
+              <input type="number" step="0.5" min="0" max="24" value="7.5" class="form-control" id="checkin-sleep-input" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Detonantes / Estímulos de Riesgo Activos:</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12.5px;">
+              <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="checkin-trigger" value="Día de cobro de dinero" /> Cobro de dinero</label>
+              <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="checkin-trigger" value="Soledad / Aburrimiento" /> Soledad / Aburrimiento</label>
+              <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="checkin-trigger" value="Discusión familiar" /> Discusión familiar</label>
+              <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="checkin-trigger" value="Mensajes promocionales apuestas" /> Promociones de juego</label>
+              <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="checkin-trigger" value="Estrés financiero / Deudas" /> Estrés financiero</label>
+              <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="checkin-trigger" value="Consumo de alcohol" /> Consumo de alcohol</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notas / Reflexión del Día:</label>
+            <textarea class="form-control" id="checkin-notes-input" placeholder="¿Cómo te sentiste hoy? ¿Qué estrategias de recuperación utilizaste?"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="window.patientModule.closeCheckinModal()">Cancelar</button>
+          <button class="btn btn-success" onclick="window.patientModule.saveCheckin()">💾 Guardar Check-in</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: REGISTRO / EDICIÓN DE DEUDA CON ACUERDO PACTADO -->
+    <div class="modal-overlay" id="debt-modal">
+      <div class="modal-dialog lg">
+        <div class="modal-header">
+          <div class="modal-title" id="debt-modal-title">Registrar Nueva Deuda y Acuerdo</div>
+          <button class="modal-close" onclick="window.debtsModule.closeDebtModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="debt-form-id" />
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Acreedor / Prestamista / Entidad: <span class="required">*</span></label>
+              <input type="text" class="form-control" id="debt-creditor-input" placeholder="Ej: Banco Popular, Don Aurelio, Tío Manuel..." />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono de Contacto Directo:</label>
+              <input type="tel" class="form-control" id="debt-phone-input" placeholder="+1 (809) 555-0000" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Categoría de Deuda:</label>
+              <select class="form-control" id="debt-type-select">
+                <option value="Entidad Bancaria / Tarjeta">Entidad Bancaria / Tarjeta de Crédito</option>
+                <option value="Prestamista Informal / Usura">Prestamista Informal / Usura (Gota a gota)</option>
+                <option value="Familiar / Amistad">Familiar / Amistad</option>
+                <option value="Casa de Empeño">Casa de Empeño</option>
+                <option value="Microcrédito Online">Microcrédito Online</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Prioridad de Amortización:</label>
+              <select class="form-control" id="debt-priority-select">
+                <option value="Alta">Alta (Riesgo legal o personal inmediato)</option>
+                <option value="Media">Media (Intereses moderados)</option>
+                <option value="Baja">Baja (Acuerdo flexible)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Monto Tomado Prestado ($): <span class="required">*</span></label>
+              <input type="number" class="form-control" id="debt-borrowed-input" placeholder="4500" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Saldo Adeudado a la Fecha ($): <span class="required">*</span></label>
+              <input type="number" class="form-control" id="debt-owed-input" placeholder="2900" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tasa / Intereses:</label>
+              <input type="text" class="form-control" id="debt-rate-input" placeholder="0% (Congelado)" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Frecuencia de Pago:</label>
+              <select class="form-control" id="debt-freq-select">
+                <option value="Semanal">Semanal</option>
+                <option value="Quincenal">Quincenal</option>
+                <option value="Mensual">Mensual</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Próxima Fecha de Vencimiento:</label>
+              <input type="date" class="form-control" id="debt-due-input" />
+            </div>
+          </div>
+
+          <!-- ESPACIO EXTENSO PARA EL ACUERDO PACTADO -->
+          <div class="form-group" style="background:rgba(2, 132, 199, 0.06);border:1px solid rgba(56, 189, 248, 0.3);padding:14px;border-radius:var(--radius-md);">
+            <label class="form-label" style="color:var(--brand-blue-light);font-size:13.5px;">
+              🤝 Términos del Acuerdo Pactado con el Prestamista o Entidad:
+            </label>
+            <textarea class="form-control" id="debt-agreement-input" style="min-height:95px;" placeholder="Documenta aquí todos los detalles acordados: ¿Se congelaron intereses? ¿Se pactó un descuento/quita? ¿Qué cuotas fijas se acordaron? ¿Quién del entorno familiar figura como garante/interlocutor verificado para entregar los pagos?"></textarea>
+            <small style="color:var(--text-dim);display:block;margin-top:4px;">
+              Regla familiar: Las cuotas deben ser pagadas únicamente por el Responsable Financiero para garantizar transparencia.
+            </small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="window.debtsModule.closeDebtModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="window.debtsModule.saveDebt()">💾 Guardar Deuda y Acuerdo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: REGISTRO DE ABONO / AMORTIZACIÓN -->
+    <div class="modal-overlay" id="amortize-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">💵 Registrar Abono de Deuda</div>
+          <button class="modal-close" onclick="window.debtsModule.closeAmortizeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="amortize-debt-id" />
+          <div style="background:var(--surface-navy);padding:12px;border-radius:var(--radius-md);margin-bottom:14px;">
+            <div style="font-size:12px;color:var(--text-dim);">ACREEDOR:</div>
+            <div style="font-size:15px;font-weight:700;color:#ffffff;" id="amortize-creditor-name">-</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">SALDO PENDIENTE ACTUAL:</div>
+            <div style="font-size:18px;font-weight:800;color:var(--danger-crimson-light);" id="amortize-current-owed">$0</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Monto Abonado ($): <span class="required">*</span></label>
+            <input type="number" class="form-control" id="amortize-amount-input" placeholder="150" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Detalle del Comprobante / Notas:</label>
+            <input type="text" class="form-control" id="amortize-note-input" placeholder="Ej: Transferencia #128912 efectuada por Carlos Gómez" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="window.debtsModule.closeAmortizeModal()">Cancelar</button>
+          <button class="btn btn-success" onclick="window.debtsModule.saveAmortization()">✅ Registrar Pago</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 4: EDITAR ROL FAMILIAR -->
+    <div class="modal-overlay" id="edit-role-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">👤 Asignar Familiar al Rol</div>
+          <button class="modal-close" onclick="window.familyModule.closeEditRoleModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-role-id" />
+          <div style="font-size:14px;font-weight:700;color:var(--brand-blue-light);margin-bottom:14px;" id="edit-role-title">-</div>
+
+          <div class="form-group">
+            <label class="form-label">Nombre del Familiar:</label>
+            <input type="text" class="form-control" id="edit-role-name" placeholder="Ej: Carlos Gómez" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Parentesco / Vínculo:</label>
+              <input type="text" class="form-control" id="edit-role-relation" placeholder="Ej: Hermano, Pareja, Madre..." />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono de Contacto:</label>
+              <input type="tel" class="form-control" id="edit-role-phone" placeholder="+1 (809) 555-0144" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="window.familyModule.closeEditRoleModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="window.familyModule.saveRoleEdit()">💾 Guardar Asignación</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 5: AGREGAR TAREA FAMILIAR -->
+    <div class="modal-overlay" id="add-task-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">📋 Asignar Nuevo Compromiso Familiar</div>
+          <button class="modal-close" onclick="window.familyModule.closeAddTaskModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Rol Familiar Responsable:</label>
+            <select class="form-control" id="task-role-select"></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Descripción de la Tarea / Compromiso: <span class="required">*</span></label>
+            <input type="text" class="form-control" id="task-text-input" placeholder="Ej: Acompañar a la cita de psiquiatría el martes" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Fecha Límite / Programada:</label>
+            <input type="date" class="form-control" id="task-due-input" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="window.familyModule.closeAddTaskModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="window.familyModule.saveNewTask()">💾 Asignar Tarea</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 6: GOOGLE CLIENT ID SETUP -->
+    <div class="modal-overlay" id="google-setup-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">☁️ Conectar con Cuenta de Google</div>
+          <button class="modal-close" onclick="window.appRouter.closeGoogleSetupModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">
+            Conecta tu cuenta de Google para sincronizar tus datos con <b>Google Sheets</b> (tablas maestras), <b>Google Docs</b> (informes clínicos), <b>Google Calendar</b> (citas y vencimientos) y <b>Google Drive</b> (copias de seguridad).
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Google OAuth 2.0 Client ID:</label>
+            <input type="text" class="form-control" id="google-client-id-input" placeholder="Ej: 123456789-abc.apps.googleusercontent.com" />
+            <small style="font-size:11.5px;color:var(--text-dim);display:block;margin-top:4px;">
+              Obtenlo en <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color:var(--brand-blue-light);">Google Cloud Console</a> habilitando Google Sheets, Docs, Calendar y Drive APIs.
+            </small>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:16px;">
+            <button class="btn btn-primary" style="flex:1;" id="save-google-client-btn">🔑 Guardar e Iniciar Sesión</button>
+            <button class="btn btn-outline" onclick="window.googleAuth.signOut()">Cerrar Sesión</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 7: PROTOCOLO SOS DE EMERGENCIA -->
+    <div class="modal-overlay" id="sos-modal">
+      <div class="modal-dialog" style="border: 2px solid var(--danger-crimson);">
+        <div class="modal-header" style="background:linear-gradient(135deg, #7f1d1d, #0f172a);">
+          <div class="modal-title" style="color:#ffffff;">🚨 Protocolo SOS de Emergencia</div>
+          <button class="modal-close" onclick="window.sosModule.closeSosModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="alert-box danger">
+            <span>⚠️</span>
+            <div>
+              <strong>¡Detén la acción! No tomes decisiones financieras en este momento.</strong>
+              El impulso es temporal. Sigue de inmediato estos 3 pasos de contención:
+            </div>
+          </div>
+
+          <!-- STEP 1: COMPANION -->
+          <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:700;color:var(--brand-blue-light);">PASO 1: ENLACE CON TU ACOMPAÑANTE DE GUARDIA</div>
+            <div style="font-size:15px;font-weight:800;color:#ffffff;margin:4px 0;" id="sos-companion-name">Carlos Gómez (Hermano)</div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <a id="sos-call-btn" href="#" class="btn btn-primary btn-sm" style="flex:1;">📞 Llamar Ahora</a>
+              <a id="sos-wa-btn" href="#" target="_blank" class="btn btn-success btn-sm" style="flex:1;">💬 Enviar WhatsApp</a>
+            </div>
+          </div>
+
+          <!-- STEP 2: URGE SURFING -->
+          <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:700;color:var(--brand-blue-light);">PASO 2: CONTENCIÓN CORPORAL</div>
+            <p style="font-size:12.5px;color:var(--text-muted);margin:4px 0 8px 0;">Inicia el pacer de respiración para surfear los 8 minutos críticos de la curva de urgencia.</p>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="window.sosModule.launchUrgeSurfingFromSos()">
+              🌊 Iniciar Audio y Pacer Urge Surfing
+            </button>
+          </div>
+
+          <!-- STEP 3: OFFICIAL HELPLINES -->
+          <div style="background:var(--surface-navy);border:1px solid var(--border-card);border-radius:var(--radius-md);padding:14px;">
+            <div style="font-size:12px;font-weight:700;color:var(--danger-crimson-light);">PASO 3: LÍNEAS OFICIALES DE AYUDA Y CRISIS (24/7)</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;font-size:12.5px;">
+              <a href="tel:900200225" style="color:var(--brand-blue-light);text-decoration:none;">📞 Línea de Ayuda a la Ludopatía: <b>900 200 225</b></a>
+              <a href="tel:988" style="color:var(--brand-blue-light);text-decoration:none;">📞 Línea de Prevención de Crisis y Suicidio: <b>988 / 024</b></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript Application Bundle -->
+  <script src="js/state.js"></script>
+  <script src="js/utils/sound.js"></script>
+  <script src="js/utils/charts.js"></script>
+  <script src="js/utils/export.js"></script>
+  <script src="js/google/auth.js"></script>
+  <script src="js/google/sheets.js"></script>
+  <script src="js/google/docs.js"></script>
+  <script src="js/google/calendar.js"></script>
+  <script src="js/google/drive.js"></script>
+  <script src="js/modules/patient.js"></script>
+  <script src="js/modules/family.js"></script>
+  <script src="js/modules/debts.js"></script>
+  <script src="js/modules/exercises.js"></script>
+  <script src="js/modules/psychoeducation.js"></script>
+  <script src="js/modules/sos.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
