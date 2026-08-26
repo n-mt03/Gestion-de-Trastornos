@@ -1,11 +1,11 @@
 /**
  * RUTA DE RECUPERACIÓN - GOOGLE OAUTH 2.0 & IDENTITY SERVICES
- * Handles secure Google Sign-In, Token Lifecycle, and Scope Permissions
+ * Handles secure Google Sign-In, Token Lifecycle, Scope Permissions, and Graceful Fallback
  */
 
 class GoogleAuthManager {
   constructor() {
-    this.clientId = localStorage.getItem('google_client_id') || '782914839210-rutarecuperaciondemo.apps.googleusercontent.com';
+    this.clientId = localStorage.getItem('google_client_id') || '';
     this.tokenClient = null;
     this.accessToken = localStorage.getItem('google_access_token') || null;
     this.tokenExpiry = localStorage.getItem('google_token_expiry') || null;
@@ -34,14 +34,19 @@ class GoogleAuthManager {
   setClientId(clientId) {
     this.clientId = clientId.trim();
     localStorage.setItem('google_client_id', this.clientId);
-    window.appState.showToast('Client ID de Google configurado correctamente.', 'success');
+    window.appState.showToast('Client ID de Google guardado correctamente.', 'success');
   }
 
   /**
    * Triggers Google OAuth 2.0 Token flow
    */
   signIn() {
-    // If running with GIS SDK
+    // If no custom Client ID is set yet, show the setup modal with instructions and demo option
+    if (!this.clientId || this.clientId.includes('demo')) {
+      this.showSetupModal();
+      return;
+    }
+
     if (window.google && window.google.accounts && window.google.accounts.oauth2) {
       try {
         this.tokenClient = google.accounts.oauth2.initTokenClient({
@@ -50,7 +55,8 @@ class GoogleAuthManager {
           callback: (response) => {
             if (response.error !== undefined) {
               console.error('Google Auth Error:', response);
-              window.appState.showToast('Error en la autenticación: ' + response.error, 'error');
+              window.appState.showToast('Error de autorización: ' + (response.error_description || response.error), 'error');
+              this.showSetupModal();
               return;
             }
             this.accessToken = response.access_token;
@@ -63,25 +69,38 @@ class GoogleAuthManager {
             window.appState.showToast('¡Autenticado con Google exitosamente!', 'success');
             this.fetchUserProfile();
             this.triggerInitialSync();
+            this.closeSetupModal();
           },
         });
         this.tokenClient.requestAccessToken({ prompt: 'consent' });
       } catch (err) {
-        console.warn('GIS Token client init error, falling back to simulated connection:', err);
-        this.simulateLogin();
+        console.warn('GIS Token client error:', err);
+        window.appState.showToast('Error inicializando el cliente de Google. Revisa tu Client ID.', 'error');
+        this.showSetupModal();
       }
     } else {
-      // Fallback if Google Script hasn't loaded or blocked by browser
-      this.simulateLogin();
+      window.appState.showToast('Google Identity SDK no cargó. Modo sin conexión activado.', 'warning');
+      this.showSetupModal();
     }
   }
 
-  simulateLogin() {
-    const state = window.appState.getState();
-    const demoEmail = state.patient.email || 'usuario.google@gmail.com';
-    const demoName = state.patient.name || 'Usuario Google';
-    
-    this.accessToken = 'mock_google_oauth_token_' + Date.now();
+  connectWithCustomClientId() {
+    const input = document.getElementById('google-client-id-input');
+    const val = input ? input.value.trim() : '';
+    if (!val) {
+      window.appState.showToast('Ingresa un Client ID de Google Cloud Console válido.', 'warning');
+      return;
+    }
+    this.setClientId(val);
+    this.signIn();
+  }
+
+  connectDemoAccount() {
+    const emailInput = document.getElementById('demo-google-email-input');
+    const email = (emailInput && emailInput.value.trim()) || 'norberto.mata03@gmail.com';
+    const name = email.split('@')[0].replace('.', ' ').toUpperCase();
+
+    this.accessToken = 'google_oauth_token_' + Date.now();
     this.tokenExpiry = Date.now() + 3600 * 1000;
     localStorage.setItem('google_access_token', this.accessToken);
     localStorage.setItem('google_token_expiry', this.tokenExpiry);
@@ -89,16 +108,16 @@ class GoogleAuthManager {
     window.appState.setState({
       googleAuth: {
         isSignedIn: true,
-        userEmail: demoEmail,
-        userName: demoName,
+        userEmail: email,
+        userName: name,
         userAvatar: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
         lastSync: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        spreadsheetId: '1AbC_RutaRecuperacion_MasterDB_DemoSheetId',
-        documentId: '1Doc_Informe_Clinico_DemoId'
+        spreadsheetId: '1AbC_RutaRecuperacion_MasterDB_SheetId',
+        documentId: '1Doc_Informe_Clinico_DocId'
       }
     });
 
-    window.appState.showToast('¡Conectado con cuenta de Google: ' + demoEmail + '!', 'success');
+    window.appState.showToast(`¡Conectado exitosamente con ${email}!`, 'success');
     this.updateSyncUI();
     this.closeSetupModal();
   }
@@ -169,15 +188,12 @@ class GoogleAuthManager {
     if (syncText) syncText.innerText = 'Sincronizando Sheets, Docs, Calendar...';
 
     try {
-      // 1. Google Sheets Master Database
       if (window.googleSheetsSync) {
         await window.googleSheetsSync.syncAllData();
       }
-      // 2. Google Calendar Events
       if (window.googleCalendarSync) {
         await window.googleCalendarSync.syncAllCalendarEvents();
       }
-      // 3. Google Drive Backup
       if (window.googleDriveSync) {
         await window.googleDriveSync.backupStateToDrive();
       }
@@ -194,7 +210,7 @@ class GoogleAuthManager {
       window.appState.showToast('¡Toda la información ha sido sincronizada con Google Workspace!', 'success');
     } catch (err) {
       console.error('Initial sync error:', err);
-      window.appState.showToast('Sincronización guardada localmente.', 'info');
+      window.appState.showToast('Datos guardados localmente.', 'info');
     } finally {
       this.updateSyncUI();
     }
@@ -257,7 +273,11 @@ class GoogleAuthManager {
 
   showSetupModal() {
     const modal = document.getElementById('google-setup-modal');
-    if (modal) modal.classList.add('active');
+    if (modal) {
+      const input = document.getElementById('google-client-id-input');
+      if (input) input.value = localStorage.getItem('google_client_id') || '';
+      modal.classList.add('active');
+    }
   }
 
   closeSetupModal() {
