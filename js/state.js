@@ -103,7 +103,7 @@ class AppState {
           roleTitle: 'Enlace Médico / Psiquiátrico',
           roleCode: '5',
           memberName: 'Ana Massiel',
-          relation: 'Hija (Médico)',
+          relation: 'Hija',
           phone: '+1 (809) 555-0004',
           keyTask: 'Supervisar toma de Naltrexona, monitoreo de sueño y registro de efectos secundarios.',
           tasks: []

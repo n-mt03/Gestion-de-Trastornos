@@ -81,28 +81,28 @@ def create_roles_pdf(output_path):
         
         # Norberto Mata
         [
-            Paragraph("<b>Norberto Mata</b><br/>Hijo (Ing. Electrónico)<br/><br/><b>Coordinador Familiar</b>", td_bold_style),
+            Paragraph("<b>Norberto Mata</b><br/>Hijo<br/><br/><b>Coordinador Familiar</b>", td_bold_style),
             Paragraph("<b>Responsabilidad:</b> Gestión de citas, coordinación de reuniones familiares y comunicación principal.<br/><b>Recomendación:</b> Mantener un calendario compartido (ej. Google Calendar) para todas las citas. Establecer un día y hora fijos para reuniones familiares de 15 minutos enfocadas en revisión de compromisos sin reproches.", td_style),
             Paragraph("&bull; Programar las citas psicológicas y psiquiátricas.<br/>&bull; Enviar recordatorios de las reuniones por WhatsApp al grupo familiar.<br/>&bull; Moderar la reunión semanal familiar para evitar conflictos.", td_style)
         ],
         
         # Alberto Mata
         [
-            Paragraph("<b>Alberto Mata</b><br/>Hijo (Ing. Electrónico)<br/><br/><b>Responsable Financiero</b>", td_bold_style),
+            Paragraph("<b>Alberto Mata</b><br/>Hijo<br/><br/><b>Responsable Financiero</b>", td_bold_style),
             Paragraph("<b>Responsabilidad:</b> Manejo temporal de deudas, recolección de fondos económicos familiares y control estricto de dinero.<br/><b>Recomendación:</b> Buen control emocional para no ceder a manipulaciones. Llevar un registro escrito de deudas y aportes. No entregar efectivo sobrante ni 'rescates' de emergencia.", td_style),
             Paragraph("&bull; Consolidar el listado de deudas con los prestamistas.<br/>&bull; Recolectar las cuotas aportadas por cada familiar.<br/>&bull; Realizar pagos directamente a las deudas sin pasar el dinero por las manos del paciente.<br/>&bull; Asignar el presupuesto semanal estrictamente calculado.", td_style)
         ],
         
         # Ana Massiel
         [
-            Paragraph("<b>Ana Massiel</b><br/>Hija (Médico General)<br/><br/><b>Enlace Médico / Psiquiátrico</b>", td_bold_style),
+            Paragraph("<b>Ana Massiel</b><br/>Hija<br/><br/><b>Enlace Médico / Psiquiátrico</b>", td_bold_style),
             Paragraph("<b>Responsabilidad:</b> Seguimiento de la medicación y control del estado de salud del paciente, convive con el paciente y su hija Gabriela.<br/><b>Recomendación:</b> Usar un pastillero organizado semanalmente. Administrar la medicación en mano (no dejar frascos a disposición libre). Aislar a la niña Gabriela de situaciones estresantes o conflictos en la casa.", td_style),
             Paragraph("&bull; Dar la medicación a las horas indicadas y supervisar la toma.<br/>&bull; Reportar efectos secundarios o alteraciones de sueño al psiquiatra.<br/>&bull; Controlar rutinas de higiene del sueño, limitando uso de pantallas nocturnas.", td_style)
         ],
         
         # Norberto B. Mata
         [
-            Paragraph("<b>Norberto B. Mata</b><br/>Esposo (Ing. Mecánico)<br/><br/><b>Acompañante en Riesgo / Apoyo Emocional</b>", td_bold_style),
+            Paragraph("<b>Norberto B. Mata</b><br/>Esposo<br/><br/><b>Acompañante en Riesgo / Apoyo Emocional</b>", td_bold_style),
             Paragraph("<b>Responsabilidad:</b> Acompañamiento del paciente para evitar aislamiento, apoyo moral y contención en crisis.<br/><b>Recomendación:</b> Recibir terapia individual para prevenir desgaste emocional y soportar el proceso. Apoyarse en los hijos. No juzgar, escuchar activamente.", td_style),
             Paragraph("&bull; Planificar salidas cortas o actividades manuales conjuntas para ocupar el tiempo libre.<br/>&bull; Estar físicamente presente en horas de alto riesgo (noches, fines de semana).<br/>&bull; Aplicar técnicas de Anclaje Sensorial (5-4-3-2-1) cuando el paciente sienta ansiedad.", td_style)
         ]
